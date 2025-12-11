@@ -16,7 +16,7 @@ import { aiQaSingleFile, aiQaSingleFileSchema } from './tools/ai-qa-single-file.
 const server = new Server(
   {
     name: 'box-minimal',
-    version: '1.0.0',
+    version: '1.0.2',
   },
   {
     capabilities: {
