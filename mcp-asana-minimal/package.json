@@ -1,0 +1,37 @@
+{
+  "name": "mcp-asana-minimal",
+  "version": "1.1.0",
+  "description": "Minimal Asana MCP server with essential task operations (6 tools)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-asana-minimal": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "asana",
+    "task-management",
+    "minimal"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "asana": "^2.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/asana": "^0.18.17",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
