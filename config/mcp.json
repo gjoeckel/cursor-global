@@ -40,6 +40,7 @@
       "env": {
         "BOX_CLIENT_ID": "${BOX_CLIENT_ID}",
         "BOX_CLIENT_SECRET": "${BOX_CLIENT_SECRET}",
+        "BOX_ACCESS_TOKEN": "${BOX_ACCESS_TOKEN}",
         "BOX_DEV_TOKEN": "${BOX_DEV_TOKEN}"
       }
     }

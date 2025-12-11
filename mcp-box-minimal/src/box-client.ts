@@ -19,7 +19,15 @@ export function getBoxClient(): any {
     const accessToken = process.env.BOX_ACCESS_TOKEN;
     const devToken = process.env.BOX_DEV_TOKEN;
 
-    // Use developer token if available (simpler for testing)
+    // Priority 1: Use OAuth access token if available (from stored OAuth flow)
+    if (accessToken) {
+      const auth = new BoxDeveloperTokenAuth({ token: accessToken });
+      client = new BoxClient({ auth });
+      clientInitialized = true;
+      return client;
+    }
+
+    // Priority 2: Use developer token for quick testing (expires in 60 minutes)
     if (devToken) {
       const auth = new BoxDeveloperTokenAuth({ token: devToken });
       client = new BoxClient({ auth });
@@ -27,27 +35,22 @@ export function getBoxClient(): any {
       return client;
     }
 
-    // Otherwise, use OAuth access token
-    if (!clientId || !clientSecret) {
+    // If neither token is available, provide helpful error
+    if (clientId && clientSecret) {
       throw new Error(
-        'BOX_CLIENT_ID and BOX_CLIENT_SECRET environment variables are required. ' +
-        'Get your credentials from: https://app.box.com/developers/console'
+        'BOX_ACCESS_TOKEN or BOX_DEV_TOKEN is required. ' +
+        'You have BOX_CLIENT_ID and BOX_CLIENT_SECRET configured. ' +
+        'Complete OAuth flow to get BOX_ACCESS_TOKEN, or use BOX_DEV_TOKEN for testing. ' +
+        'Get developer token from: https://app.box.com/developers/console'
       );
     }
 
-    if (!accessToken) {
-      throw new Error(
-        'Either BOX_ACCESS_TOKEN or BOX_DEV_TOKEN is required. ' +
-        'Get developer token from Box Developer Console for testing, ' +
-        'or complete OAuth flow to get access token.'
-      );
-    }
-
-    // For OAuth, we'd typically use BoxOAuth, but for MCP we'll use the access token directly
-    // This is a simplified approach - full OAuth flow would require callback handling
-    const auth = new BoxDeveloperTokenAuth({ token: accessToken });
-    client = new BoxClient({ auth });
-    clientInitialized = true;
+    throw new Error(
+      'Box authentication required. Provide either:\n' +
+      '  - BOX_ACCESS_TOKEN (from OAuth flow) - recommended for production\n' +
+      '  - BOX_DEV_TOKEN (for testing, expires in 60 min)\n' +
+      'Get credentials from: https://app.box.com/developers/console'
+    );
   }
   return client;
 }

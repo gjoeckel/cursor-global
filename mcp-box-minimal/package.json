@@ -1,6 +1,6 @@
 {
   "name": "mcp-box-minimal",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Minimal Box MCP server with essential file operations (6 tools)",
   "type": "module",
   "main": "dist/index.js",

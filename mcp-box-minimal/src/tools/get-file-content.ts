@@ -30,20 +30,20 @@ export async function getFileContent(args: {
   try {
     // First, get file info to check type
     const fileInfo = await client.files.getFileById(args.file_id);
-    
+
     // For text files, get content directly using downloads manager
     if (fileInfo.name.endsWith('.txt') || fileInfo.name.endsWith('.md') ||
         fileInfo.name.endsWith('.json') || fileInfo.name.endsWith('.csv')) {
       const stream = await client.downloads.downloadFile(args.file_id);
       if (stream) {
         const chunks: Buffer[] = [];
-        
+
         for await (const chunk of stream) {
           chunks.push(chunk);
         }
-        
+
         const content = Buffer.concat(chunks).toString('utf-8');
-        
+
         return {
           file_id: fileInfo.id,
           file_name: fileInfo.name,
@@ -53,11 +53,11 @@ export async function getFileContent(args: {
         };
       }
     }
-    
+
     // For other files, get download URL
     // Note: Full text extraction for PDF/Word requires Box AI or additional processing
     const downloadUrl = await client.downloads.getDownloadFileUrl(args.file_id);
-    
+
     return {
       file_id: fileInfo.id,
       file_name: fileInfo.name,
