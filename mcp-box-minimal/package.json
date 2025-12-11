@@ -1,0 +1,35 @@
+{
+  "name": "mcp-box-minimal",
+  "version": "1.0.0",
+  "description": "Minimal Box MCP server with essential file operations (6 tools)",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-box-minimal": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "box",
+    "file-storage",
+    "minimal"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "box-node-sdk": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,70 @@
+import { getBoxClient } from '../box-client.js';
+
+export const getFileContentSchema = {
+  name: 'box_get_file_content',
+  description: 'Get the content of a file from Box (supports text, PDF, Word, etc.)',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      file_id: {
+        type: 'string',
+        description: 'File ID to read (required)',
+      },
+      as_text: {
+        type: 'boolean',
+        description: 'Return as plain text (default: true). If false, returns base64 encoded content',
+      },
+    },
+    required: ['file_id'],
+  },
+};
+
+export async function getFileContent(args: {
+  file_id: string;
+  as_text?: boolean;
+}) {
+  const client = getBoxClient();
+  const asText = args.as_text !== false; // Default to true
+
+  // Get file representation (for text extraction)
+  try {
+    // First, get file info to check type
+    const fileInfo = await client.files.get(args.file_id);
+
+    // For text files, get content directly
+    if (fileInfo.name.endsWith('.txt') || fileInfo.name.endsWith('.md') ||
+        fileInfo.name.endsWith('.json') || fileInfo.name.endsWith('.csv')) {
+      const stream = await client.files.getReadStream(args.file_id);
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of stream) {
+        chunks.push(chunk);
+      }
+
+      const content = Buffer.concat(chunks).toString('utf-8');
+
+      return {
+        file_id: fileInfo.id,
+        file_name: fileInfo.name,
+        content: asText ? content : Buffer.from(content).toString('base64'),
+        content_type: 'text',
+        size: fileInfo.size,
+      };
+    }
+
+    // For other files, get download URL or representation
+    // Note: Full text extraction for PDF/Word requires Box AI or additional processing
+    const downloadUrl = await client.files.getDownloadURL(args.file_id);
+
+    return {
+      file_id: fileInfo.id,
+      file_name: fileInfo.name,
+      download_url: downloadUrl,
+      content_type: fileInfo.type || 'unknown',
+      size: fileInfo.size,
+      message: 'For PDF/Word files, use box_ai_qa_single_file to extract text content',
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to get file content: ${error.message || String(error)}`);
+  }
+}

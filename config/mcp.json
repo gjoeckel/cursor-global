@@ -1,32 +1,5 @@
 {
   "mcpServers": {
-    "github-minimal": {
-      "command": "node",
-      "args": ["${HOME}/Projects/accessilist/my-mcp-servers/packages/github-minimal/build/index.js"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
-    "shell-minimal": {
-      "command": "node",
-      "args": ["${HOME}/Projects/accessilist/my-mcp-servers/packages/shell-minimal/build/index.js"],
-      "env": {
-        "WORKING_DIRECTORY": "${HOME}/Projects/accessilist",
-        "ALLOWED_COMMANDS": "npm,git,node,php,composer,curl,wget,ls,cat,grep,find,chmod,chown,mkdir,rm,cp,mv"
-      }
-    },
-    "puppeteer-minimal": {
-      "command": "node",
-      "args": ["${HOME}/Projects/accessilist/my-mcp-servers/packages/puppeteer-minimal/build/index.js"]
-    },
-    "sequential-thinking-minimal": {
-      "command": "node",
-      "args": ["${HOME}/Projects/accessilist/my-mcp-servers/packages/sequential-thinking-minimal/build/index.js"]
-    },
-    "everything-minimal": {
-      "command": "node",
-      "args": ["${HOME}/Projects/accessilist/my-mcp-servers/packages/everything-minimal/build/index.js"]
-    },
     "filesystem": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "${HOME}"],
@@ -35,9 +8,40 @@
         "READ_ONLY": "false"
       }
     },
-    "memory": {
+    "github-minimal": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
+      "args": ["-y", "mcp-github-minimal"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "shell-minimal": {
+      "command": "npx",
+      "args": ["-y", "mcp-shell-minimal"],
+      "env": {
+        "WORKING_DIRECTORY": "${HOME}",
+        "ALLOWED_COMMANDS": "npm,git,node,php,composer,curl,wget,ls,cat,grep,find,chmod,chown,mkdir,rm,cp,mv,pwd,echo,which"
+      }
+    },
+    "agent-autonomy": {
+      "command": "npx",
+      "args": ["-y", "mcp-agent-autonomy"]
+    },
+    "asana-minimal": {
+      "command": "node",
+      "args": ["/Users/a00288946/Agents/cursor-ops/mcp-asana-minimal/dist/index.js"],
+      "env": {
+        "ASANA_ACCESS_TOKEN": "${ASANA_ACCESS_TOKEN}"
+      }
+    },
+    "box-minimal": {
+      "command": "node",
+      "args": ["/Users/a00288946/Agents/cursor-ops/mcp-box-minimal/dist/index.js"],
+      "env": {
+        "BOX_CLIENT_ID": "${BOX_CLIENT_ID}",
+        "BOX_CLIENT_SECRET": "${BOX_CLIENT_SECRET}",
+        "BOX_DEV_TOKEN": "${BOX_DEV_TOKEN}"
+      }
     }
   }
 }
