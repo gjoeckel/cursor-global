@@ -10,8 +10,13 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "dev": "npx tsc --watch"
+    "dev": "npx tsc --watch",
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -19,8 +24,13 @@
     "file-storage",
     "minimal"
   ],
-  "author": "",
+  "author": "idbygeorge",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gjoeckel/my-mcp-servers.git",
+    "directory": "packages/box-minimal"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "box-node-sdk": "^10.0.0"

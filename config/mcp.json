@@ -28,15 +28,15 @@
       "args": ["-y", "mcp-agent-autonomy"]
     },
     "asana-minimal": {
-      "command": "node",
-      "args": ["/Users/a00288946/Agents/cursor-ops/mcp-asana-minimal/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-asana-minimal"],
       "env": {
         "ASANA_ACCESS_TOKEN": "${ASANA_ACCESS_TOKEN}"
       }
     },
     "box-minimal": {
-      "command": "node",
-      "args": ["/Users/a00288946/Agents/cursor-ops/mcp-box-minimal/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "mcp-box-minimal"],
       "env": {
         "BOX_CLIENT_ID": "${BOX_CLIENT_ID}",
         "BOX_CLIENT_SECRET": "${BOX_CLIENT_SECRET}",

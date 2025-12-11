@@ -147,11 +147,11 @@ List of recommended Cursor IDE extensions. See **[RECOMMENDED-EXTENSIONS.md](REC
 ### `config/mcp.json`
 MCP (Model Context Protocol) server configuration for:
 - Filesystem operations
-- Memory/knowledge management
 - Shell command execution
 - GitHub integration
-- Browser automation (Puppeteer)
 - Agent autonomy
+- Asana task management (minimal - 6 tools)
+- Box file storage (minimal - 6 tools)
 
 ### `config/settings.json`
 Cursor IDE settings optimized for AI-assisted development
