@@ -42,14 +42,16 @@ export async function searchFiles(args: {
   const offset = args.offset || 0;
 
   const searchParams: any = {
-    query: args.query,
-    limit,
-    offset,
-    fields: 'id,name,type,size,modified_at,created_at,parent',
+    queryParams: {
+      query: args.query,
+      limit,
+      offset,
+      fields: ['id', 'name', 'type', 'size', 'modified_at', 'created_at', 'parent'],
+    },
   };
 
   if (args.file_extensions && args.file_extensions.length > 0) {
-    searchParams.file_extensions = args.file_extensions.join(',');
+    searchParams.queryParams.file_extensions = args.file_extensions;
   }
 
   const results = await client.search.searchForContent(searchParams);

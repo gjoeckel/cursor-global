@@ -44,15 +44,16 @@ export async function uploadFile(args: {
     fileBuffer = Buffer.from(args.content, 'utf-8');
   }
 
-  // Create readable stream from buffer
-  const fileStream = Readable.from(fileBuffer);
-
-  // Upload file
-  const uploadedFile = await client.files.uploadFile(
-    args.folder_id,
-    args.file_name,
-    fileStream
-  );
+  // Upload file using uploads manager
+  const uploadedFile = await client.uploads.uploadFile({
+    attributes: {
+      name: args.file_name,
+      parent: {
+        id: args.folder_id,
+      },
+    },
+    file: Readable.from(fileBuffer) as any,
+  });
 
   return {
     file_id: uploadedFile.entries[0].id,

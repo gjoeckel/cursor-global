@@ -34,9 +34,11 @@ export async function listFolderItems(args: {
   const offset = args.offset || 0;
 
   const folder = await client.folders.getFolderItems(args.folder_id, {
-    limit,
-    offset,
-    fields: 'id,name,type,size,modified_at,created_at,parent',
+    queryParams: {
+      limit,
+      offset,
+      fields: ['id', 'name', 'type', 'size', 'modified_at', 'created_at', 'parent'],
+    },
   });
 
   return {

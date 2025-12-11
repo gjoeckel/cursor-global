@@ -20,8 +20,10 @@ export async function getFileDetails(args: {
 }) {
   const client = getBoxClient();
 
-  const file = await client.files.get(args.file_id, {
-    fields: 'id,name,type,size,modified_at,created_at,description,parent,shared_link,permissions,version_number,sha1',
+  const file = await client.files.getFileById(args.file_id, {
+    queryParams: {
+      fields: ['id', 'name', 'type', 'size', 'modified_at', 'created_at', 'description', 'parent', 'shared_link', 'permissions', 'version_number', 'sha1'],
+    },
   });
 
   return {

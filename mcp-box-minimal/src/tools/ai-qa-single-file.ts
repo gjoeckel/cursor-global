@@ -28,7 +28,7 @@ export async function aiQaSingleFile(args: {
   try {
     // Box AI API endpoint for single file queries
     // Note: This uses Box's AI API which may require specific permissions
-    const response = await client.ai.ask({
+    const response = await client.ai.createAiAsk({
       items: [
         {
           type: 'file',
