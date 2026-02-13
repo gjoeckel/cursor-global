@@ -2,7 +2,7 @@
   "ai-start": {
     "description": "Load AI session context and initialize environment",
     "commands": [
-      "bash ~/cursor-global/scripts/session-start.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/session-start.sh"
     ],
     "auto_approve": true,
     "timeout": 30000,
@@ -11,7 +11,7 @@
   "ai-end": {
     "description": "Save session context and generate changelog",
     "commands": [
-      "bash ~/cursor-global/scripts/session-end.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/session-end.sh"
     ],
     "auto_approve": true,
     "timeout": 20000,
@@ -20,7 +20,7 @@
   "ai-update": {
     "description": "Record mid-session progress",
     "commands": [
-      "bash ~/cursor-global/scripts/session-update.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/session-update.sh"
     ],
     "auto_approve": true,
     "timeout": 20000,
@@ -29,7 +29,7 @@
   "ai-repeat": {
     "description": "Reload session context",
     "commands": [
-      "bash ~/cursor-global/scripts/session-start.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/session-start.sh"
     ],
     "auto_approve": true,
     "timeout": 20000,
@@ -50,7 +50,7 @@
   "ai-compress": {
     "description": "Compress session context into summary",
     "commands": [
-      "bash ~/cursor-global/scripts/compress-context.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/compress-context.sh"
     ],
     "auto_approve": true,
     "timeout": 30000,
@@ -59,7 +59,7 @@
   "mcp-health": {
     "description": "Check MCP server health and status",
     "commands": [
-      "bash ~/cursor-global/scripts/check-mcp-health.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/check-mcp-health.sh"
     ],
     "auto_approve": true,
     "timeout": 15000,
@@ -68,7 +68,7 @@
   "mcp-restart": {
     "description": "Restart all MCP servers",
     "commands": [
-      "bash ~/cursor-global/scripts/restart-mcp-servers.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/restart-mcp-servers.sh"
     ],
     "auto_approve": true,
     "timeout": 30000,
@@ -77,7 +77,7 @@
   "ai-local-commit": {
     "description": "Update changelog and commit all changes to current local branch",
     "commands": [
-      "bash ~/cursor-global/scripts/git-local-commit.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/git-local-commit.sh"
     ],
     "auto_approve": true,
     "timeout": 20000,
@@ -86,7 +86,7 @@
   "ai-local-merge": {
     "description": "Merge current branch to main, auto-updates changelog (handles conflicts gracefully)",
     "commands": [
-      "bash ~/cursor-global/scripts/git-local-merge.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/git-local-merge.sh"
     ],
     "auto_approve": true,
     "timeout": 30000,
@@ -95,7 +95,7 @@
   "ai-merge-finalize": {
     "description": "Finalize merge after manual conflict resolution (updates changelog, run from main)",
     "commands": [
-      "bash ~/cursor-global/scripts/git-local-merge.sh --finalize"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/git-local-merge.sh --finalize"
     ],
     "auto_approve": true,
     "timeout": 10000,
@@ -104,10 +104,64 @@
   "ai-docs-sync": {
     "description": "Generate project workflows.md from global and project configs",
     "commands": [
-      "bash ~/cursor-global/scripts/generate-workflows-doc.sh"
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/generate-workflows-doc.sh"
     ],
     "auto_approve": true,
     "timeout": 10000,
     "on_error": "continue"
+  },
+  "mcp-setup": {
+    "description": "Setup and configure MCP servers (re-run if needed)",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/setup-mcp-servers.sh"
+    ],
+    "auto_approve": true,
+    "timeout": 60000,
+    "on_error": "continue"
+  },
+  "agent-comms-check": {
+    "description": "Check for pending agent communication messages",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/check-agent-comms.sh"
+    ],
+    "auto_approve": true,
+    "timeout": 10000,
+    "on_error": "continue"
+  },
+  "yolo-full": {
+    "description": "Initialize full autonomous mode with MCP validation",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/validate-autonomous-mode.sh"
+    ],
+    "auto_approve": true,
+    "timeout": 30000,
+    "on_error": "continue"
+  },
+  "start-project": {
+    "description": "Open multi-root workspace with development and resources folders",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/start-project.sh"
+    ],
+    "auto_approve": true,
+    "timeout": 30000,
+    "on_error": "continue"
+  },
+  "change-project": {
+    "description": "Update project development and resources folder paths",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/change-project-paths.sh"
+    ],
+    "auto_approve": false,
+    "timeout": 60000,
+    "on_error": "stop"
+  },
+  "RRW": {
+    "description": "Read-Request-Wait Protocol: 1) Repeat understanding 2) Request info 3) Wait for auth",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/rrw-protocol.sh"
+    ],
+    "auto_approve": false,
+    "timeout": 10000,
+    "on_error": "stop"
   }
 }

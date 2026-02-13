@@ -1,0 +1,48 @@
+RESEARCH QUERY: Box MCP Server Connection Issue on macOS with Cursor IDE
+
+CONTEXT:
+- System: macOS 26.1 (Darwin 25.1.0), Cursor IDE, Node.js v24.9.0
+- Using local stdio-based MCP server (mcp-box-minimal v1.0.5) via StdioServerTransport
+- Server process runs but fails to connect to Cursor IDE
+
+PROBLEM:
+The box-minimal MCP server process is running (confirmed via ps aux) but:
+- Does NOT appear in "claude mcp list" output
+- Tools are NOT available to AI agent
+- Other MCP servers (filesystem, github-minimal, asana-minimal, etc.) work correctly
+- OAuth token was refreshed and updated in ~/.cursor/mcp.json
+
+WHY BOX REMOTE MCP PROXY DOESN'T APPLY:
+Box Remote MCP Proxy (https://github.com/box-community/box-remote-mcp-proxy) is designed for remote HTTP/WebSocket MCP servers, NOT local stdio-based servers. Our setup uses StdioServerTransport for direct parent-child process communication via stdio pipes, which is fundamentally different from HTTP-based remote servers.
+
+CONFIGURATION:
+~/.cursor/mcp.json contains:
+{
+  "box-minimal": {
+    "command": "npx",
+    "args": ["-y", "mcp-box-minimal"],
+    "env": {
+      "BOX_CLIENT_ID": "...",
+      "BOX_CLIENT_SECRET": "...",
+      "BOX_ACCESS_TOKEN": "6hpJLIspGbp8cue0ZxVYTIcwQSjH099b"
+    }
+  }
+}
+
+SERVER IMPLEMENTATION:
+- Uses StdioServerTransport() from @modelcontextprotocol/sdk
+- Lazy initialization: Box client only created when tools are called
+- Authentication via BOX_ACCESS_TOKEN environment variable
+- No refresh token support (intentionally removed in v1.0.5)
+
+RESEARCH QUESTIONS:
+1. Why would a stdio-based MCP server process start but fail to connect to Cursor IDE?
+2. What prevents Cursor from recognizing a running MCP server process despite it being active?
+3. Are there known issues with mcp-box-minimal or stdio transport on macOS/Cursor?
+4. How to debug stdio communication between Cursor and MCP servers?
+5. Does Cursor properly pass environment variables to stdio-based MCP servers?
+6. Alternative solutions or workarounds for Box MCP integration?
+
+NEED:
+Diagnosis, debugging steps, known solutions, and best practices for stdio-based MCP servers with OAuth on macOS/Cursor.
+

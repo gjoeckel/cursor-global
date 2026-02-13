@@ -17,7 +17,6 @@ See [OPTIMIZED-CONFIG.md](./OPTIMIZED-CONFIG.md) for the complete configuration.
 * **[IDE-SETUP-GUIDE.md](./IDE-SETUP-GUIDE.md)** - Comprehensive setup instructions for:
   * Cursor IDE
   * Antigravity IDE
-  * Claude Code IDE (Claude Desktop)
 
 ---
 

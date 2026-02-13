@@ -1,11 +1,11 @@
 {
   "name": "mcp-box-minimal",
-  "version": "1.0.3",
+  "version": "1.1.2",
   "description": "Minimal Box MCP server with essential file operations (6 tools)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mcp-box-minimal": "./dist/index.js"
+    "mcp-box-minimal": "dist/index.js"
   },
   "scripts": {
     "build": "npx tsc",
@@ -28,7 +28,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/gjoeckel/my-mcp-servers.git",
+    "url": "git+https://github.com/gjoeckel/my-mcp-servers.git",
     "directory": "packages/box-minimal"
   },
   "dependencies": {

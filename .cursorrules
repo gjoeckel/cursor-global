@@ -1,0 +1,50 @@
+# Cursor Rules for Online Courses & Otter Integration
+
+## 1. RESPONSE STYLE & EFFICIENCY
+- BE CONCISE. Output code or answers directly. No conversational filler.
+- PREFER TARGETED EDITS. Do not rewrite entire PHP files. Use unified diffs or specific function replacements to save tokens.
+- PRESERVE LEGACY PATTERNS. Match the existing coding style (PHP 8.4 compatibility) unless explicitly asked to refactor.
+
+## 2. CRITICAL PROJECT CONSTRAINTS (STRICT)
+- NO-TOUCH UI POLICY: Do not modify HTML structure, Bootstrap 5.1 classes, or CSS unless explicitly instructed. The UI must remain pixel-perfect for regression testing.
+- DATABASE REWIRING: When working on `db.php` or `NewDatabaseService`, prioritize checking column names (e.g., `first_name` vs `name`).
+- OTTER SUB-SYSTEM: Be aware that `/otter` files function as a distinct sub-system with enterprise-specific configs.
+
+## 3. TECH STACK STANDARDS
+- Language: PHP (Target 8.4+; Vanilla/Legacy compatibility required).
+- Database: MySQL / MariaDB (Prioritize PDO over mysqli).
+- Integration: Canvas LMS API (REST).
+- Frontend: Bootstrap 5.1.
+
+## 4. Asana Subtask Creation Rules
+When creating subtasks in Asana, follow these critical rules:
+1. DO NOT add subtasks to projects - Subtasks should NOT include `projects` or `memberships` fields.
+2. DO NOT add subtasks to sections - Subtasks should NOT be section members.
+3. Only parent tasks go in sections - Only top-level tasks should be added to project sections.
+4. Subtasks inherit from parent - Subtasks automatically inherit project/section context from their parent task.
+
+### Correct Asana Pattern:
+```typescript
+// ✅ Parent task: Include projects and memberships
+const parentTask = await createTask({
+  name: "Parent Task",
+  projects: [PROJECT_ID],
+  memberships: [{ project: PROJECT_ID, section: SECTION_ID }],
+});
+
+// ✅ Subtask: NO projects or memberships
+const subtask = await createSubtask(parentTask.gid, {
+  name: "Subtask Name",
+  notes: "Subtask notes",
+});
+```
+
+## 5. Read-Request-Wait (RRW) Protocol
+When a user includes `/RRW` in their prompt, you MUST follow this three-step protocol BEFORE performing any significant actions or code changes:
+1. Repeat Understanding: Paraphrase the user's request.
+2. Request Info: Ask for any missing information, file paths, or clarifications.
+3. Wait for Authorization: Explicitly state that you are waiting for the user's "GO" or authorization.
+
+## 6. Versioning Rules
+1. Incremental Versioning: Each time a file is updated, update the version number (e.g., `// Version: X.X.X`) at the top of the file before pushing changes.
+2. Push After Version + Code Change: After updating a file version and making code changes in an Apps Script / clasp project (e.g. `canvas_reports/reports_generator`), always push to the remote repo by running `clasp push` from that project’s directory.

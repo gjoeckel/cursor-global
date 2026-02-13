@@ -280,6 +280,57 @@ npm run install-all
 
 ---
 
+## 📦 Box MCP token (cursor-ops)
+
+**cursor-ops is always available to any project.** You can store the Box OAuth token in cursor-ops so the Box MCP server gets it even when you **launch Cursor from the Dock** (not from a terminal), where `~/.zshrc` is never sourced.
+
+### Token file: `config/box.env`
+
+- **Path:** `config/box.env` inside the cursor-ops repo (e.g. `$HOME/Agents/cursor-ops/config/box.env`).
+- **Gitignored:** Yes (in cursor-ops `.gitignore`). Never committed.
+- **Contents:** `export BOX_ACCESS_TOKEN="…"` and optionally `export BOX_REFRESH_TOKEN="…"` (updated by the OAuth script; MCP also writes refreshed tokens here when it auto-refreshes).
+
+### How the Box MCP gets the token when you start from the Dock
+
+The Box MCP in `config/mcp.json` is started with a **wrapper** that sources env before running the server:
+
+1. **Source `config/box.env`** from cursor-ops (so the token is available to the MCP process).
+2. **Source `~/.zshrc`** (fallback and other vars).
+3. **Run** `npx -y mcp-box-minimal`.
+
+So the token is read from cursor-ops first; no need to start Cursor from a terminal.
+
+### Getting a token (writes to both ~/.zshrc and config/box.env)
+
+From a terminal (with `BOX_CLIENT_ID` and `BOX_CLIENT_SECRET` set, e.g. in `~/.zshrc`):
+
+```bash
+cd <cursor-ops>/mcp-box-minimal
+node scripts/get-oauth-token.js
+```
+
+The script writes the new token to **both** `~/.zshrc` and cursor-ops **config/box.env**. The Box MCP process must then be restarted to pick up the new token (see below).
+
+### ⚠️ Token just updated but Box still says "expired"?
+
+**Root cause:** The Box MCP is a long-lived process. It reads `box.env` only when the process **starts**. Changing `box.env` on disk does not affect an already-running MCP. Cursor does not restart MCP servers when you "reload" the window.
+
+**Best-practice fix (pick one):**
+
+1. **Full quit and reopen (most reliable)**  
+   **Quit Cursor completely** (e.g. Cmd+Q on Mac, or Cursor → Quit), then open Cursor again. That kills the Box MCP process; on next start it will run the wrapper, source `config/box.env`, and see the new token.
+
+2. **Trigger MCP reconnect without full quit**  
+   Edit and save the MCP config Cursor actually uses (usually `~/.cursor/mcp.json`): e.g. add a space or newline in the `box-minimal` section, then save. That can cause Cursor to restart the Box MCP so it re-sources `box.env`. If that doesn't restart the server, use (1).
+
+**Verify:** After restart, run a simple Box tool (e.g. list folder `0`). If you still see "Developer token has expired", confirm `config/box.env` contains a single line like `export BOX_ACCESS_TOKEN="…"` with the token you just generated, and that you used **full quit** (not just Reload Window).
+
+### If cursor-ops is not at `$HOME/Agents/cursor-ops`
+
+The wrapper uses `CURSOR_OPS` if set, otherwise `$HOME/Agents/cursor-ops`. If your cursor-ops repo is elsewhere, set `CURSOR_OPS` (e.g. in Cursor’s environment or in the MCP server env in your Cursor settings) to the absolute path of the cursor-ops directory.
+
+---
+
 ## 📁 File Locations Reference
 
 ### **Global Configuration (System-wide)**
@@ -296,6 +347,10 @@ npm run install-all
 └── (10 symlinked scripts)
 
 ~/.zshrc                        ✅ PATH configuration
+
+<cursor-ops>/config/
+├── box.env                     ✅ Box OAuth token (gitignored; used when Cursor starts from Dock)
+└── ...                         (mcp.json, workflows, etc.)
 ```
 
 ### **Project Configuration (Optional, per-project)**
@@ -375,7 +430,14 @@ npm run install-all
 
 ## 🎓 Best Practices for AI Agents
 
-### **1. Prefer Global Over Project-Specific**
+### **1. Consider MCP Tools First**
+- **For any new process/script, FIRST consider if using MCP tools is optimal**
+- MCP tools provide standardized, well-tested functionality
+- Available MCP tools include: filesystem operations, memory storage, GitHub operations, shell commands, browser automation
+- Only create custom scripts when MCP tools cannot meet the requirement
+- This ensures consistency, reduces maintenance, and leverages existing infrastructure
+
+### **2. Prefer Global Over Project-Specific**
 - Use global workflows when possible
 - Only create project workflows for truly project-specific tasks
 - Don't duplicate global functionality

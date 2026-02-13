@@ -160,10 +160,18 @@ echo "✅ filesystem - 15 tools (official)"
 echo "✅ memory - 8 tools (official)"
 echo "✅ shell-minimal - 4 tools (custom)"
 echo "✅ github-minimal - 4 tools (custom)"
-echo "✅ puppeteer-minimal - 4 tools (custom)"
+echo "✅ playwright-minimal - 4 tools (custom)"
 echo "✅ agent-autonomy - 4 tools (custom)"
 echo "=================================="
 echo ""
+
+# Check for agent-comms messages
+if [ -x "$SCRIPTS_DIR/check-agent-comms.sh" ]; then
+    echo -e "${CYAN}📬 Checking for agent communication messages...${NC}"
+    echo "=================================="
+    "$SCRIPTS_DIR/check-agent-comms.sh" || true
+    echo ""
+fi
 
 # Final summary
 echo -e "${BLUE}🎉 Context loading complete!${NC}"

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { getAsanaClient } from '../asana-client.js';
 
 export const createTaskSchema = {
   name: 'asana_create_task',
@@ -31,6 +30,10 @@ export const createTaskSchema = {
         type: 'string',
         description: 'Due date in YYYY-MM-DD format (optional)',
       },
+      section: {
+        type: 'string',
+        description: 'Section GID to add task to (optional, requires project)',
+      },
     },
     required: ['name'],
   },
@@ -43,8 +46,15 @@ export async function createTask(args: {
   project?: string;
   assignee?: string;
   due_on?: string;
+  section?: string;
 }) {
-  const client = getAsanaClient();
+  const token = process.env.ASANA_ACCESS_TOKEN;
+  if (!token) {
+    throw new Error(
+      'ASANA_ACCESS_TOKEN environment variable is required. ' +
+      'Get your token from: https://app.asana.com/0/my-apps'
+    );
+  }
 
   const taskData: any = {
     name: args.name,
@@ -60,6 +70,16 @@ export async function createTask(args: {
 
   if (args.project) {
     taskData.projects = [args.project];
+
+    // If section is specified, use memberships to add task to specific section
+    if (args.section) {
+      taskData.memberships = [
+        {
+          project: args.project,
+          section: args.section,
+        },
+      ];
+    }
   }
 
   if (args.assignee) {
@@ -70,19 +90,36 @@ export async function createTask(args: {
     taskData.due_on = args.due_on;
   }
 
-  const task = await new Promise((resolve, reject) => {
-    client.tasks.createTask(taskData, {}, (error: any, data: any) => {
-      if (error) reject(error);
-      else resolve(data);
+  // CRITICAL: Wrap in { data: {...} }
+  const body = { data: taskData };
+
+  try {
+    // Use fetch for reliable promise-based HTTP requests
+    const response = await fetch('https://app.asana.com/api/1.0/tasks', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     });
-  });
 
-  const taskDataResult = (task as any).data;
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
 
-  return {
-    task_id: taskDataResult.gid,
-    name: taskDataResult.name,
-    notes: taskDataResult.notes || '',
-    created_at: taskDataResult.created_at,
-  };
+    const result = await response.json() as { data: any };
+    const taskDataResult = result.data;
+
+    return {
+      task_id: taskDataResult.gid,
+      name: taskDataResult.name,
+      notes: taskDataResult.notes || '',
+      created_at: taskDataResult.created_at,
+      section: args.section || null,
+    };
+  } catch (error: any) {
+    throw new Error(`Failed to create task: ${error.message}`);
+  }
 }

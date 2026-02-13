@@ -1,0 +1,23 @@
+Research the Asana MCP create-task error:
+
+Problem: mcp-asana-minimal's createTask is failing with "Cannot read properties of undefined (reading 'hasOwnProperty')" error.
+
+Current code:
+- Uses Asana OpenAPI client (Asana.ApiClient.instance)
+- Creates TasksApi instance: new AsanaAny.TasksApi()
+- Calls: client.tasks.createTask(taskData, {}, callback)
+
+Working examples in same codebase:
+- updateTask(updateData, taskId, {}, callback) - WORKS
+- getTask(taskId, {opt_fields: [...]}, callback) - WORKS
+- createStoryForTask({text}, taskId, {opt_fields: [...]}, callback) - WORKS
+
+Questions:
+1. What is correct createTask signature for Asana OpenAPI client?
+2. Why does updateTask work but createTask fails with same pattern?
+3. What causes "Cannot read properties of undefined (reading 'hasOwnProperty')"?
+4. Correct way to create task with Asana npm package?
+5. Examples of working Asana task creation in Node.js?
+
+Need: Root cause, corrected implementation, explanation, verification steps.
+

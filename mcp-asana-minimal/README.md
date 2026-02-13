@@ -1,6 +1,6 @@
 # mcp-asana-minimal
 
-**Minimal Asana MCP server with essential task operations (6 tools)**
+**Minimal Asana MCP server with essential task operations (11 tools)**
 
 A lightweight Model Context Protocol (MCP) server for Asana that provides only the essential task management tools, designed to stay under Cursor's 40-tool limit.
 
@@ -8,7 +8,7 @@ A lightweight Model Context Protocol (MCP) server for Asana that provides only t
 
 ## Features
 
-- ✅ **6 Essential Tools** - Only what you need
+- ✅ **11 Essential Tools** - Only what you need
 - ✅ **Personal Access Token Auth** - Simple authentication
 - ✅ **TypeScript** - Type-safe implementation
 - ✅ **Lightweight** - Minimal dependencies
@@ -17,12 +17,17 @@ A lightweight Model Context Protocol (MCP) server for Asana that provides only t
 
 ## Tools
 
-1. **`asana_create_task`** - Create a new task
+1. **`asana_create_task`** - Create a new task (supports section parameter)
 2. **`asana_update_task`** - Update an existing task
 3. **`asana_get_task`** - Get task details
 4. **`asana_list_tasks`** - List tasks with filters
 5. **`asana_list_projects`** - List projects in workspace(s)
 6. **`asana_add_comment`** - Add comments to tasks
+7. **`asana_create_section`** - Create a new section in a project (works for both list and board views)
+8. **`asana_list_sections`** - List all sections in a project
+9. **`asana_add_task_to_section`** - Move an existing task to a different section/column
+10. **`asana_create_subtask`** - Create a new subtask within an existing task
+11. **`asana_list_subtasks`** - List all subtasks of a task
 
 ---
 
@@ -116,6 +121,7 @@ Create a new task in Asana.
 - `notes` (optional) - Task description
 - `workspace` (optional) - Workspace GID
 - `project` (optional) - Project GID
+- `section` (optional) - Section GID to add task to (requires project)
 - `assignee` (optional) - Assignee GID
 - `due_on` (optional) - Due date (YYYY-MM-DD)
 
@@ -165,6 +171,51 @@ Add a comment (story) to an existing task.
 **Parameters:**
 - `task_id` (required) - Task GID
 - `text` (required) - Comment text
+
+### asana_create_section
+
+Create a new section in an Asana project. Works for both list sections and board columns.
+
+**Parameters:**
+- `project` (required) - Project GID
+- `name` (required) - Section name
+
+### asana_list_sections
+
+List all sections (list sections or board columns) in a project.
+
+**Parameters:**
+- `project` (required) - Project GID
+
+### asana_add_task_to_section
+
+Move an existing task to a different section/column.
+
+**Parameters:**
+- `task_id` (required) - The GID of the task to move
+- `section_id` (required) - The GID of the section to move the task to
+
+### asana_create_subtask
+
+Create a new subtask within an existing task.
+
+**⚠️ IMPORTANT:** Subtasks should NOT be added to projects or sections. They exist only as children of their parent task. Adding subtasks to projects causes them to appear as duplicates in section views. See [ASANA-SUBTASK-BEST-PRACTICES.md](../docs/ASANA-SUBTASK-BEST-PRACTICES.md) for details.
+
+**Parameters:**
+- `parent_task_id` (required) - The GID of the parent task
+- `name` (required) - Name of the subtask
+- `notes` (optional) - Subtask description/notes
+- `assignee` (optional) - User GID or "me" to assign the subtask
+- `due_on` (optional) - Due date in YYYY-MM-DD format
+
+**Note:** This tool does NOT accept `project` or `section` parameters. Subtasks inherit context from their parent task.
+
+### asana_list_subtasks
+
+List all subtasks of a task.
+
+**Parameters:**
+- `task_id` (required) - The GID of the parent task
 
 ---
 

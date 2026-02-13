@@ -34,6 +34,7 @@ export function getAsanaClient(): any {
       users: new AsanaAny.UsersApi(),
       workspaces: new AsanaAny.WorkspacesApi(),
       stories: new AsanaAny.StoriesApi(),
+      sections: new AsanaAny.SectionsApi(),
     };
 
     clientInitialized = true;

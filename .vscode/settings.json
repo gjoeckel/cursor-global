@@ -1,0 +1,46 @@
+{
+  "sqltools.connections": [
+    {
+      "database": "onlinecourses",
+      "driver": "MySQL",
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "name": "WebAIM Online Courses (RDS)",
+      "password": "1ggA@SB4",
+      "port": 3306,
+      "previewLimit": 50,
+      "server": "webaim.cksrc9aw1l51.us-east-2.rds.amazonaws.com",
+      "ssh": "Disabled",
+      "username": "onlinecourses"
+    }
+  ],
+  "php.suggest.basic": false,
+  "editor.formatOnSave": false,
+  "search.exclude": {
+    "**/vendor": true,
+    "**/node_modules": true,
+    "**/cache": true
+  },
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "REWIRE",
+    "UI-KEEP"
+  ],
+  "todo-tree.highlights.customHighlight": {
+    "REWIRE": {
+      "foreground": "#fbbf24",
+      "icon": "database",
+      "type": "tag"
+    },
+    "UI-KEEP": {
+      "foreground": "#34d399",
+      "icon": "eye",
+      "type": "tag"
+    }
+  }
+}

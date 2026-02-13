@@ -22,6 +22,7 @@
 - Integrate with MCP memory for persistent storage
 
 ## 📊 **Active Configurations**
+- **Project Paths**: Configured via `config/project-paths.json`
 - **MCP Servers**: memory, github, filesystem, sequential-thinking, everything, puppeteer, postgres
 - **SRD Tools**: ESLint, Prettier, Jest with SRD-specific rules
 - **GitHub Push Gate**: Requires token "push to github"

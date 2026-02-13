@@ -48,7 +48,7 @@ export async function listTasks(args: {
     const projectTasks = await new Promise((resolve, reject) => {
       client.tasks.getTasksForProject(args.project, {
         opt_fields: ['name', 'notes', 'completed', 'due_on', 'assignee'],
-        limit,
+      limit,
       }, (error: any, data: any) => {
         if (error) reject(error);
         else resolve(data);
@@ -70,9 +70,9 @@ export async function listTasks(args: {
 
     const userTasks = await new Promise((resolve, reject) => {
       client.tasks.getTasks({
-        assignee: assigneeGid,
+      assignee: assigneeGid,
         opt_fields: ['name', 'notes', 'completed', 'due_on', 'assignee'],
-        limit,
+      limit,
       }, (error: any, data: any) => {
         if (error) reject(error);
         else resolve(data);
@@ -83,9 +83,9 @@ export async function listTasks(args: {
     // List tasks in a workspace
     const workspaceTasks = await new Promise((resolve, reject) => {
       client.tasks.getTasks({
-        workspace: args.workspace,
+      workspace: args.workspace,
         opt_fields: ['name', 'notes', 'completed', 'due_on', 'assignee'],
-        limit,
+      limit,
       }, (error: any, data: any) => {
         if (error) reject(error);
         else resolve(data);
@@ -104,7 +104,7 @@ export async function listTasks(args: {
       client.tasks.getTasks({
         assignee: (user as any).data.gid,
         opt_fields: ['name', 'notes', 'completed', 'due_on', 'assignee'],
-        limit,
+      limit,
       }, (error: any, data: any) => {
         if (error) reject(error);
         else resolve(data);
