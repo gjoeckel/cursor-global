@@ -10,6 +10,7 @@
 - Initial AI changelog automation system setup
 - SRD development environment configured
 - MCP tools installed and operational
+- 2026-02-13: Canvas reports (reports_generator) session changelog added; docs/resources reorganized (architecture + legacy)
 
 ## 💡 **Key Decisions & Context**
 - Focus on Simple, Reliable, DRY development principles

@@ -1,0 +1,26 @@
+# Run measure-yolo-full.sh on relevant changes and on a schedule.
+# Fails if completeness or efficiency checks fail (exit non-zero).
+name: yolo-full measure
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/measure-yolo-full.sh'
+      - 'scripts/validate-autonomous-mode.sh'
+      - 'scripts/display-project-paths.sh'
+      - 'scripts/show-project-startup.sh'
+      - 'config/project-paths.json'
+      - 'config/workflows.json'
+  schedule:
+    # Run weekly (Sunday 06:00 UTC) to catch regressions
+    - cron: '0 6 * * 0'
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run yolo-full measurement
+        run: bash scripts/measure-yolo-full.sh --json

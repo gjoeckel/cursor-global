@@ -1,3 +1,10 @@
+# Cohort Structure Refactor (Version 7.0.0) — ARCHIVED
+
+**Archived:** 2026-02-13  
+**Reason:** Superseded by later implementations (v12+). Column counts and some logic (e.g. Submitted/Enrolled sources) differ in current code. Kept for historical reference only.
+
+---
+
 # Cohort Structure Refactor (Version 7.0.0)
 
 ## Overview

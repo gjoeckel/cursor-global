@@ -45,6 +45,17 @@ When a user includes `/RRW` in their prompt, you MUST follow this three-step pro
 2. Request Info: Ask for any missing information, file paths, or clarifications.
 3. Wait for Authorization: Explicitly state that you are waiting for the user's "GO" or authorization.
 
-## 6. Versioning Rules
+## 6. [canvas_media_manager] Project Rules
+*Applies when working on canvas_media_manager development or resources paths (see `config/project-paths.json`).*
+
+- **Paths:** Development: `$HOME/Projects/canvas_media_manager`; Resources: `$HOME/Agents/resources/canvas_media_manager`.
+- **Box folder map:** Box folder 184899190488 (AD-365-V4) mapping artifacts and plans go in the project resources folder.
+- **Mapping script location:** Scripts for Box folder traversal live in `cursor-ops/mcp-box-minimal/scripts/`; output goes to `resources/canvas_media_manager/`.
+- **Tech stack:** Node.js, Box Node SDK; future: Asana API integration.
+
+## 7. Versioning Rules
 1. Incremental Versioning: Each time a file is updated, update the version number (e.g., `// Version: X.X.X`) at the top of the file before pushing changes.
-2. Push After Version + Code Change: After updating a file version and making code changes in an Apps Script / clasp project (e.g. `canvas_reports/reports_generator`), always push to the remote repo by running `clasp push` from that project’s directory.
+2. Apps Script / clasp: After every authorized change in an Apps Script project (e.g. `canvas_reports/reports_generator`), (a) ensure changes are saved, (b) validate the change is present in the local file (e.g. grep or read the modified section) before proceeding, (c) iterate the version ID in the changed file(s), then (d) run `clasp push` from that project's directory. Do (b)–(d) in the same response—do not wait for the user to ask.
+
+## 8. Script/Command Policy
+**Script and command execution policy** (run without asking vs ask first) is defined in `.cursor/rules/agent-action-policy.mdc`. When in doubt about whether to run a script automatically or ask first, refer to that file.

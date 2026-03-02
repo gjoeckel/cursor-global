@@ -1,5 +1,7 @@
 # Cursor Global - Quick Start Guide
 
+**For AI agents: see [AGENTS.md](AGENTS.md)**
+
 **✨ Place it ANYWHERE - Desktop, Documents, USB drive, anywhere!**
 
 ## 🚀 30-Second Setup (New Machine)

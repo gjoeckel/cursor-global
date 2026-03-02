@@ -1,12 +1,20 @@
 {
   "canvas_reports": {
     "development": {
-      "folder": "/Users/a00288946/Projects/canvas_reports/reports_generator",
+      "folder": "/Users/a00288946/Projects/onlinecourses-production",
       "description": "Active development workspace for canvas reports projects (CCC, CSU). Contains Apps Script code, clasp configurations, and git repositories."
     },
     "resources": {
-      "folder": "/Users/a00288946/Agents/resources/canvas-reports/reports_generator",
+      "folder": "/Users/a00288946/Agents/resources/otter",
       "description": "Documentation, testing files, and resources for canvas reports system. Contains generic documentation, enterprise-specific docs, and testing utilities."
+    },
+    "production_baseline": {
+      "folder": "/Users/a00288946/Projects/onlinecourses-feb-10",
+      "description": "Legacy production code (read-only). Feb 10 sync; do not overwrite."
+    },
+    "production_current": {
+      "folder": "/Users/a00288946/Projects/onlinecourses",
+      "description": "Current production code synced from server; use for current state and porting."
     }
   }
 }

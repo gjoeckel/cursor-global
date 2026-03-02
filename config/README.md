@@ -6,6 +6,26 @@
 
 ---
 
+## ⚠️ Important: cursor-ops Configuration Context
+
+**In cursor-ops, configuration files live in this `config/` directory:**
+- `project-paths.json` - Development and resources folder mappings
+- `workflows.json` - Workflow definitions (including `yolo-full`)
+- `mcp.json` - MCP server configuration
+- `box.env` - Box OAuth token (gitignored)
+
+**Scripts use `CURSOR_OPS` environment variable** to locate this directory. When running scripts from other directories, set `CURSOR_OPS` to the cursor-ops repo root.
+
+**MCP and config changes require a full restart:** After changing `config/mcp.json`, `config/box.env`, or copying either to `~/.cursor/`, **fully quit Cursor (Cmd+Q) and reopen**. Reload Window is not sufficient for MCP servers to pick up changes.
+
+**Filesystem MCP allowed directories (args only):** Cursor does not support the MCP Roots protocol (`roots/list` returns "Method not found"), so **relying on args in mcp.json is the correct and only reliable approach** for the filesystem server. The official `@modelcontextprotocol/server-filesystem` uses **command-line args** for allowed paths (it ignores any `ALLOWED_PATHS` env var). In `config/mcp.json`, add each allowed directory as an extra element in the `filesystem` server's `args` array (after `@modelcontextprotocol/server-filesystem`). When you add a new project in `project-paths.json`, add that project's development and resources folders to the filesystem `args` in `config/mcp.json`, then **copy to `~/.cursor/mcp.json`** so Cursor uses the updated config, and **fully restart Cursor** (Cmd+Q and reopen).
+
+**Workflow paths:** `workflows.json` references cursor-ops scripts via a single wrapper (`scripts/run-workflow.sh`). After cloning cursor-ops to a new location, run **`./setup.sh`** from the repo root so it can rewrite script paths in `workflows.json` for your machine.
+
+**For global Cursor setup documentation** (system-wide `~/.cursor/` configuration), see `docs/CURSOR-AUTONOMOUS-SETUP.md`.
+
+---
+
 ## 🎯 QUICK START - Working with a New Project
 
 ### **IMPORTANT: Most Features Are Already Global**
@@ -298,7 +318,7 @@ The Box MCP in `config/mcp.json` is started with a **wrapper** that sources env 
 2. **Source `~/.zshrc`** (fallback and other vars).
 3. **Run** `npx -y mcp-box-minimal`.
 
-So the token is read from cursor-ops first; no need to start Cursor from a terminal.
+So the token is read from cursor-ops first; no need to start Cursor from a terminal. This is necessary because **Cursor started from the Dock does not source your shell profile**, so env vars from `~/.zshrc` are not available to MCP processes unless loaded in the command.
 
 ### Getting a token (writes to both ~/.zshrc and config/box.env)
 

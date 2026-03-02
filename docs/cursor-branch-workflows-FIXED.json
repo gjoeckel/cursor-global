@@ -129,12 +129,13 @@
     "on_error": "continue"
   },
   "yolo-full": {
-    "description": "Initialize full autonomous mode with MCP validation",
+    "description": "Initialize full autonomous mode with MCP validation (per agent-action-policy: run without asking). Canonical: config/workflows.json.",
     "commands": [
-      "echo '🚀 Initializing autonomous mode...'",
-      "echo '📊 Checking MCP servers...'",
-      "bash /path/to/cursor-ops/scripts/check-mcp-health.sh || true",
-      "echo '✅ Autonomous mode ready'"
+      "bash /path/to/cursor-ops/scripts/validate-autonomous-mode.sh --json",
+      "bash /path/to/cursor-ops/scripts/display-project-paths.sh",
+      "bash /path/to/cursor-ops/scripts/show-project-startup.sh",
+      "echo 'Next: read docs/AGENT-QUICKSTART.md for current-project context.'",
+      "echo '✅ yolo-full complete. Verify MCP tools connected if needed.'"
     ],
     "auto_approve": true,
     "timeout": 30000,

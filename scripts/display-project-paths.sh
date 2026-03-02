@@ -87,6 +87,24 @@ for project in $PROJECTS; do
         fi
         echo ""
     fi
+
+    # Production / reference paths (if present)
+    for ref in production_baseline production_current; do
+        REF_FOLDER=$(jq -r ".[\"$project\"].$ref.folder // empty" "$CONFIG_FILE" 2>/dev/null)
+        REF_DESC=$(jq -r ".[\"$project\"].$ref.description // empty" "$CONFIG_FILE" 2>/dev/null)
+        if [ -n "$REF_FOLDER" ] && [ "$REF_FOLDER" != "null" ]; then
+            echo "📂 ${ref}: $REF_FOLDER"
+            if [ -d "$REF_FOLDER" ]; then
+                echo "   ✅ Directory exists"
+            else
+                echo "   ⚠️  Directory does not exist"
+            fi
+            if [ -n "$REF_DESC" ] && [ "$REF_DESC" != "null" ]; then
+                echo "   Purpose: $REF_DESC"
+            fi
+            echo ""
+        fi
+    done
 done
 
 echo "✅ Directory purposes displayed"

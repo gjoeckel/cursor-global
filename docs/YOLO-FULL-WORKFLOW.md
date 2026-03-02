@@ -4,6 +4,13 @@
 
 ---
 
+## Quick navigation
+
+- **Workflow usage** (what runs when you use `/yolo-full`): [How `/yolo-full` Command Works](#how-yolo-full-command-works), [Command Definition](#command-definition), [Workflow Integration](#workflow-integration).
+- **Setup** (one-time configuration): [Cursor Settings](#cursor-settings-for-autonomous-operation), [MCP Servers Configuration](#mcp-servers-configuration), [Complete Setup Process](#complete-setup-process).
+
+---
+
 ## Table of Contents
 
 1. [Overview](#overview)
@@ -24,7 +31,7 @@ The `yolo-full` workflow initializes full autonomous mode in Cursor IDE with com
 
 - ✅ **Zero Confirmations**: AI operates without requiring approval for each action
 - ✅ **Full System Access**: Complete file system, terminal, and shell access
-- ✅ **MCP Integration**: 6 MCP servers providing 39 tools
+- ✅ **MCP Integration**: 6 MCP servers (filesystem, github-minimal, shell-minimal, agent-autonomy, asana-minimal, box-minimal); tool count may vary
 - ✅ **Auto-Execution**: Commands execute automatically
 - ✅ **Trusted Mode**: Full trust enabled for autonomous operation
 
@@ -51,22 +58,13 @@ The command appears in the chat interface when you type `/yolo-` because Cursor'
 
 ### Command Structure
 
-Based on the working implementation, the command has this structure:
+The command is defined in `.cursor/commands/yolo-full.md`. The workflow (in `config/workflows.json`) runs:
 
-```markdown
----
-description: Initialize full autonomous mode with MCP validation
-allowed-tools: run_terminal_cmd, read_file, write, search_replace, glob_file_search, grep, web_search, browser_navigate, todo_write
----
+1. `validate-autonomous-mode.sh --json` — health check (MCP config, project paths, deps)
+2. `display-project-paths.sh` — show development and resources folders
+3. A short summary echo
 
-# Autonomous Mode Initialization
-
-Execute the following startup validation:
-
-1. **Unified Validation**: Run `bash /Users/a00288946/Agents/cursor-ops/scripts/validate-autonomous-mode.sh --json` to perform a comprehensive health check.
-2. **Tools Verification**: List available MCP tools to confirm all configured servers are functional.
-3. **Status Report**: Provide a brief status based on the JSON output and tool verification.
-```
+After the workflow runs, the agent should verify MCP tools are connected and provide a status report. See the command file for full instructions.
 
 ---
 
@@ -99,6 +97,28 @@ All autonomous settings are configured in `config/settings.json`:
 | `cursor.ai.autoExecute` | `true` | Commands execute automatically |
 | `cursor.ai.trustedMode` | `true` | Trusts AI agent with full system access |
 | `cursor.ai.fullAccess` | `true` | Grants full system access to AI |
+
+### Enabling YOLO auto-apply (file edits)
+
+For the agent’s **file edits** to be applied without clicking Accept each time, enable Cursor’s YOLO / auto-apply setting. **The setting persists**—you do not need to change it or restart for each new session.
+
+**Ways to enable (pick one):**
+
+1. **Cursor Settings UI (simplest):** Open Cursor → **Settings** (Cmd+, / Ctrl+,), search for **“YOLO”** or **“auto-apply”** or **“agent”**, and turn on the option that auto-applies agent edits (wording may vary by Cursor version). No script or file copy; no restart required if the UI applies the change immediately.
+
+2. **Apply cursor-ops settings (bulk):** From the cursor-ops repo root, run:
+   ```bash
+   bash scripts/configure-cursor-autonomy.sh
+   ```
+   This copies `config/settings.json` to Cursor’s User settings directory (backing up any existing file) and configures MCP. **Restart Cursor once** (Cmd+Q / Ctrl+Q then reopen) so it loads the new settings. After that, the setting persists for all future sessions—no restart per session.
+
+3. **Manual copy:** Copy `config/settings.json` to Cursor’s User settings folder, then **restart Cursor once**:
+   - **macOS:** `~/Library/Application Support/Cursor/User/settings.json`
+   - **Linux:** `~/.config/Cursor/User/settings.json`
+   - **Windows:** `%APPDATA%\Cursor\User\settings.json`
+   Again, one restart is enough; the setting carries across all later sessions.
+
+If edits still require Accept, check Cursor Settings for a conflicting option (e.g. “Edit & Reapply”) and ensure YOLO / auto-apply is on.
 
 ### Access Permissions
 
@@ -166,96 +186,29 @@ All autonomous settings are configured in `config/settings.json`:
 
 ### Overview
 
-The setup uses **6 MCP servers** providing **39 tools total** (optimized to stay under the 40-tool limit):
+The setup uses **6 MCP servers** (see `config/mcp.json` for current list; tool counts may vary):
 
-1. **filesystem** (15 tools) - Official
-2. **memory** (8 tools) - Official
-3. **github-minimal** (4 tools) - Custom
-4. **shell-minimal** (4 tools) - Custom
-5. **playwright-minimal** (4 tools) - Custom
-6. **agent-autonomy** (4 tools) - Custom
+1. **filesystem** - File operations (official MCP server)
+2. **github-minimal** - GitHub operations (requires `GITHUB_TOKEN`)
+3. **shell-minimal** - Shell command execution (allowed commands list in config)
+4. **agent-autonomy** - Workflow execution and approval checking
+5. **asana-minimal** - Asana tasks (requires `ASANA_ACCESS_TOKEN`)
+6. **box-minimal** - Box file/folder operations (requires Box tokens in `config/box.env` or env)
 
 ### MCP Configuration File
 
-Location: `config/mcp.json`
+Location: `config/mcp.json`. The current setup includes six servers (see that file for the exact JSON):
 
-```json
-{
-  "mcpServers": {
-    "filesystem": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${HOME}"],
-      "env": {
-        "ALLOWED_PATHS": "${HOME}:${HOME}/.cursor:${HOME}/.config",
-        "READ_ONLY": "false"
-      }
-    },
-    "memory": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-memory"]
-    },
-    "github-minimal": {
-      "command": "npx",
-      "args": ["-y", "mcp-github-minimal"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
-    "shell-minimal": {
-      "command": "npx",
-      "args": ["-y", "mcp-shell-minimal"],
-      "env": {
-        "WORKING_DIRECTORY": "${HOME}",
-        "ALLOWED_COMMANDS": "npm,git,node,php,composer,curl,wget,ls,cat,grep,find,chmod,chown,mkdir,rm,cp,mv,pwd,echo,which"
-      }
-    },
-    "playwright-minimal": {
-      "command": "npx",
-      "args": ["-y", "mcp-playwright-minimal"]
-    },
-    "agent-autonomy": {
-      "command": "npx",
-      "args": ["-y", "mcp-agent-autonomy"]
-    }
-  }
-}
-```
+- **filesystem** — Official MCP filesystem server; allowed directories via **args** only (Cursor does not support Roots; server ignores `ALLOWED_PATHS` env). Keep `config/mcp.json` and `~/.cursor/mcp.json` in sync; restart Cursor after changes.
+- **github-minimal** — GitHub operations; requires `GITHUB_TOKEN`
+- **shell-minimal** — Shell command execution; `WORKING_DIRECTORY` and `ALLOWED_COMMANDS` (includes `bash`, `zsh`)
+- **agent-autonomy** — Workflow execution and approval checking
+- **asana-minimal** — Asana tasks; requires `ASANA_ACCESS_TOKEN`
+- **box-minimal** — Box file/folder operations; sources `config/box.env`, uses `CURSOR_OPS`
 
 ### How npx Installation Works
 
-All MCP servers use `npx -y` for automatic installation:
-
-#### Official Servers (via npm)
-
-- **`@modelcontextprotocol/server-filesystem`**: Official filesystem MCP server
-  - Installed via: `npx -y @modelcontextprotocol/server-filesystem`
-  - Provides: File operations, directory navigation, content management (15 tools)
-
-- **`@modelcontextprotocol/server-memory`**: Official memory MCP server
-  - Installed via: `npx -y @modelcontextprotocol/server-memory`
-  - Provides: Knowledge storage, entity management, search (8 tools)
-
-#### Custom Servers (via npm packages)
-
-All custom servers are published as npm packages and installed automatically:
-
-- **`mcp-github-minimal`**: GitHub operations
-  - Installed via: `npx -y mcp-github-minimal`
-  - Requires: `GITHUB_TOKEN` environment variable
-  - Provides: Repository operations, file management (4 tools)
-
-- **`mcp-shell-minimal`**: Shell command execution
-  - Installed via: `npx -y mcp-shell-minimal`
-  - Requires: `WORKING_DIRECTORY` and `ALLOWED_COMMANDS` environment variables
-  - Provides: Command execution, process management (4 tools)
-
-- **`mcp-playwright-minimal`**: Browser automation
-  - Installed via: `npx -y mcp-playwright-minimal`
-  - Provides: Browser navigation, screenshot, element interaction (4 tools)
-
-- **`mcp-agent-autonomy`**: Workflow automation
-  - Installed via: `npx -y mcp-agent-autonomy`
-  - Provides: Workflow execution, registration, approval checking (4 tools)
+MCP servers are started via `npx -y <package>` (or, for box-minimal, a wrapper that sources env). Cursor reads `~/.cursor/mcp.json` (often copied from cursor-ops `config/mcp.json`) and starts each server. Tool counts and package names may vary; refer to `config/mcp.json` for the authoritative list.
 
 ### Installation Process
 
@@ -425,23 +378,15 @@ If all checks pass, confirm: "Autonomous mode active. Ready for tasks."
 If issues found (e.g., missing environment variables, missing tools, or restricted permissions), list them and suggest fixes.
 ```
 
-### Alternative: Add to Workflows
+### Workflow Definition
 
-For consistency, also add to `config/workflows.json`:
+In `config/workflows.json`, `yolo-full` runs (with absolute paths):
 
-```json
-{
-  "yolo-full": {
-    "description": "Initialize full autonomous mode with MCP validation",
-    "commands": [
-      "bash /path/to/cursor-ops/scripts/validate-autonomous-mode.sh"
-    ],
-    "auto_approve": true,
-    "timeout": 30000,
-    "on_error": "continue"
-  }
-}
-```
+1. `validate-autonomous-mode.sh --json` — health check
+2. `display-project-paths.sh` — show development and resources folders
+3. A short summary echo
+
+`auto_approve: true` aligns with the agent action policy (validation scripts run without asking).
 
 ---
 
@@ -449,33 +394,7 @@ For consistency, also add to `config/workflows.json`:
 
 ### Adding yolo-full to Workflows
 
-To make `yolo-full` available as both a command and workflow:
-
-1. **Add to `config/workflows.json`**:
-
-```json
-{
-  "yolo-full": {
-    "description": "Initialize full autonomous mode with MCP validation",
-    "commands": [
-      "echo '🚀 Initializing autonomous mode...'",
-      "echo '📊 Checking MCP servers...'",
-      "bash /path/to/your/scripts/check-mcp-health.sh || true",
-      "echo '✅ Autonomous mode ready'"
-    ],
-    "auto_approve": true,
-    "timeout": 30000,
-    "on_error": "continue"
-  }
-}
-```
-
-2. **Create validation script** (optional): `scripts/validate-autonomous-mode.sh`
-
-3. **Run setup** to update symlinks:
-```bash
-./setup.sh
-```
+The workflow is already defined in `config/workflows.json`. To make it available in Cursor, ensure your global workflows (e.g. `~/.cursor/workflows.json`) include or symlink to cursor-ops workflows. Run setup if needed: `./setup.sh` or use `scripts/setup-mcp-servers.sh` for MCP config.
 
 ### Usage
 

@@ -1,7 +1,7 @@
 #!/bin/bash
-# Version: 1.1.0
+# Version: 1.2.0
 # Unified Autonomous Mode Validation Script
-# Validates MCP servers, environment variables, project paths, and system dependencies
+# Validates MCP config (servers present), project paths, and system dependencies. Skips token/env validation (tokens often loaded by Cursor or config/box.env).
 
 set -euo pipefail
 
@@ -51,9 +51,9 @@ check_dependency() {
     fi
 }
 
-# 2. MCP Validation
+# 2. MCP Config Validation (server list only; no token validation)
 validate_mcp() {
-    log "🔍 Validating MCP Servers..."
+    log "🔍 Validating MCP config (servers present)..."
     if [[ ! -f "$MCP_CONFIG" ]]; then
         error "MCP config not found at $MCP_CONFIG"
         TOTAL_ISSUES=$((TOTAL_ISSUES + 1))
@@ -68,32 +68,7 @@ validate_mcp() {
     fi
 
     for server in $servers; do
-        log "  Checking ${YELLOW}$server${NC}..."
-
-        # Check environment variables
-        local env_vars=$(jq -r ".mcpServers.\"$server\".env | keys[]?" "$MCP_CONFIG" 2>/dev/null || echo "")
-        for env_var in $env_vars; do
-            # Special case for ${HOME} expansion in JSON which is handled by the MCP loader
-            # But we should check if the variable itself is set if it's a secret
-            if [[ "$env_var" == *"TOKEN"* || "$env_var" == *"SECRET"* || "$env_var" == *"ID"* ]]; then
-                # Check for expanded value or literal value in config
-                local val=$(jq -r ".mcpServers.\"$server\".env.\"$env_var\"" "$MCP_CONFIG")
-
-                if [[ "$val" == \$\{*\} ]]; then
-                    # It's an environment variable reference like ${GITHUB_TOKEN}
-                    local var_name=$(echo "$val" | sed 's/\${//;s/}//')
-                    if [[ -z "${!var_name:-}" ]]; then
-                        log "    ⚠️  $var_name is NOT set (reported in readiness report)"
-                    else
-                        log "    ✅ $var_name is set"
-                    fi
-                elif [[ -n "$val" && "$val" != "null" ]]; then
-                    log "    ✅ $env_var is set in config"
-                else
-                    log "    ⚠️  Missing value for $env_var in $server"
-                fi
-            fi
-        done
+        log "  ✅ $server (in config)"
     done
 }
 
@@ -155,8 +130,10 @@ main() {
 
     if [[ "$JSON_OUTPUT" == "true" ]]; then
         # Build structured JSON output
-        local mcp_servers=$(jq -c '.mcpServers | keys' "$MCP_CONFIG")
-        local projects=$(jq -c '.' "$PROJECT_PATHS_CONFIG")
+        local mcp_servers='[]'
+        [[ -f "$MCP_CONFIG" ]] && mcp_servers=$(jq -c '.mcpServers | keys' "$MCP_CONFIG" 2>/dev/null || echo '[]')
+        local projects='{}'
+        [[ -f "$PROJECT_PATHS_CONFIG" ]] && projects=$(jq -c '.' "$PROJECT_PATHS_CONFIG" 2>/dev/null || echo '{}')
 
         jq -n \
             --arg status "$([[ $TOTAL_ISSUES -eq 0 ]] && echo "ready" || echo "issues")" \

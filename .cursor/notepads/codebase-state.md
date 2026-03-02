@@ -1,7 +1,11 @@
 # Codebase State Analysis: Otter Registration System
-**Date:** February 10, 2026
+**Date:** February 10, 2026 | **Status:** Outdated — see project resources for current state.
 
-## Relationship Matrix
+**Current state (2026-02-25):** Use **rewire_workflow_state.md** and **AGENT-STARTUP.md** in `Agents/resources/otter` for current phase, branch policy (default **services**; main protected), and PDO migration status. Rewire Phases 1–3 and PDO migration are complete; deploy is via push to **services** to onlinecourses-otter.
+
+---
+
+## Relationship Matrix (historical)
 
 | Environment/Branch | Architecture Type | Backend Logic Status | Current Stability |
 | :--- | :--- | :--- | :--- |

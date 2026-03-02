@@ -1,6 +1,18 @@
-# YOLO-FULL Documentation Suite
+# Documentation Suite (cursor-ops)
 
 **Complete documentation for autonomous Cursor IDE setup with MCP integration**
+
+---
+
+## 🎯 For AI Agents - Start Here
+
+**Primary entry point:** [AGENT-QUICKSTART.md](./AGENT-QUICKSTART.md)
+
+After running `/yolo-full`, read AGENT-QUICKSTART.md for current-project context and next steps.
+
+**Task-based navigation:** See [INDEX.md](./INDEX.md) to find docs by task (Asana, Box, MCP, workflows, etc.).
+
+**Cursor official docs:** [Rules](https://cursor.com/docs/context/rules) · [MCP](https://cursor.com/docs/context/mcp) · [Agent security](https://cursor.com/docs/account/agent-security)
 
 ---
 
@@ -43,6 +55,8 @@ Covers:
 
 | Document | Purpose | Audience |
 |----------|---------|----------|
+| **[AGENT-QUICKSTART.md](./AGENT-QUICKSTART.md)** | **Agent entry point after yolo-full** | **AI agents** |
+| [INDEX.md](./INDEX.md) | Find docs by task | All users |
 | [YOLO-FULL-WORKFLOW.md](./YOLO-FULL-WORKFLOW.md) | Complete workflow documentation | All users |
 | [MCP-SERVERS-IMPLEMENTATION.md](./MCP-SERVERS-IMPLEMENTATION.md) | MCP servers guide | MCP developers |
 | [CURSOR-AUTONOMOUS-SETUP.md](./CURSOR-AUTONOMOUS-SETUP.md) | Setup instructions | New users |

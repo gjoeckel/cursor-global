@@ -1,5 +1,7 @@
 # Cursor Global Configuration
 
+**For AI agents: see [AGENTS.md](AGENTS.md)**
+
 **✨ FULLY PORTABLE ✨ - Place it ANYWHERE on your machine!**
 
 **Portable Cursor IDE configuration for AI-assisted development**
@@ -122,7 +124,7 @@ When you run `./setup.sh`:
 Global Cursor workflows available in ALL projects:
 
 ### `config/recommended-extensions.txt`
-List of recommended Cursor IDE extensions. See **[RECOMMENDED-EXTENSIONS.md](RECOMMENDED-EXTENSIONS.md)** for details.
+List of recommended Cursor IDE extensions. See **[docs/RECOMMENDED-EXTENSIONS.md](docs/RECOMMENDED-EXTENSIONS.md)** for details.
 
 **AI Session Management:**
 - `ai-start` - Load session context

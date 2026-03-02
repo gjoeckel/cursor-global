@@ -1,0 +1,57 @@
+Production tree diff — 2026-02-26 11:17:32
+Local:  /Users/a00288946/Projects/onlinecourses
+Server: /var/websites/webaim/htdocs/onlinecourses
+
+========== Only in LOCAL (not on server) ==========
+.
+alumni_re_enroll.php
+auto_find_tou_assignments.php
+cron/cron_process_canvas_users.php
+cron/cron_trigger_optimized.php
+register.php
+scripts/automated_course_migration.php
+scripts/automated_grade_transfer.php
+scripts/bulk_register_cli.php
+scripts/get_course_quiz_ids.php
+scripts/import_canvas_courses.php
+scripts/import_canvas_users_to_new_table.php
+scripts/import_users_from_canvas.php
+scripts/transfer_quiz_grade.php
+scripts/update_missing_tou_quiz_ids.php
+
+========== Only on SERVER (not in local) ==========
+DELETEalumni_re_enroll.php
+DELETEauto_find_tou_assignments.php
+DELETEregister.php
+includes/registrationform copy.php
+phpfunctions/setCustomFields.php
+scripts/quiz_score_trackerOLD.php
+var/websites/webaim/htdocs/onlinecourses
+
+========== Files that DIFFER (content/checksum) ==========
+alumni_re_enroll.php
+auto_find_tou_assignments.php
+certificates.php
+course_builder.php
+register.php
+registration_backup_CCC.csv
+registration_backup_CSU.csv
+cron/cron_daily.php
+cron/cron_fetch_new_courses.php
+cron/cron_process_canvas_users.php
+cron/cron_trigger_optimized.php
+includes/registrationform.php
+scripts/automated_course_migration.php
+scripts/automated_grade_transfer.php
+scripts/bulk_register_cli.php
+scripts/fetch_course_quizzes_assignments.php
+scripts/get_course_quiz_ids.php
+scripts/import_canvas_courses.php
+scripts/import_canvas_users_to_new_table.php
+scripts/import_users_from_canvas.php
+scripts/map_quizzes_to_database.php
+scripts/quiz_score_tracker.php
+scripts/report_grade_change_status_dry_run.php
+scripts/transfer_quiz_grade.php
+scripts/update_missing_tou_quiz_ids.php
+total size is 1311508  speedup is 248.77
