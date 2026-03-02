@@ -16,7 +16,7 @@ import { aiQaSingleFile, aiQaSingleFileSchema } from './tools/ai-qa-single-file.
 const server = new Server(
   {
     name: 'box-minimal',
-    version: '1.0.2',
+    version: '1.1.2',
   },
   {
     capabilities: {
@@ -113,11 +113,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         throw new Error(`Unknown tool: ${name}`);
     }
   } catch (error: any) {
+    let errorMessage = error.message || String(error);
+
+    // If it's an auth error, provide enhanced instructions
+    if (error.isAuthError || errorMessage.includes('authentication') || errorMessage.includes('token')) {
+      const openUrlScript = process.env.BOX_OPEN_URL_SCRIPT_PATH || 'mcp-box-minimal/scripts/open-oauth-url.js';
+      errorMessage = errorMessage + `\n\n💡 Quick fix: Run 'node ${openUrlScript}' to open the OAuth URL in your browser.`;
+    }
+
     return {
       content: [
         {
           type: 'text',
-          text: `Error: ${error.message || String(error)}`,
+          text: `Error: ${errorMessage}`,
         },
       ],
       isError: true,

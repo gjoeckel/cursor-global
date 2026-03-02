@@ -1,0 +1,43 @@
+---
+description: When to run scripts and commands without asking vs when to ask first (interrupt conditions)
+alwaysApply: true
+---
+
+# Agent Action Policy
+
+Pre-declared interrupt conditions: run by default, ask only for named exceptions. Do not use ad hoc judgment.
+
+## Run without asking (reversible / low-risk)
+
+- Read operations: read files, git status, list directory, grep/search.
+- Tests and lint: test runners, linters, validation scripts.
+- Scripts: `scripts/validate-autonomous-mode.sh`, `scripts/check-mcp-health.sh`, `scripts/check-*.sh`, `scripts/session-*.sh`, `scripts/display-project-paths.sh`, `scripts/compress-context.sh`.
+- Package installs: npm install, pip install (in project).
+- File writes and edits when the user has asked for a change.
+
+## Run and report result (state-changing but expected)
+
+- Git: commit, branch, stash (no push yet).
+- Git push: run `scripts/github-push-gate.sh` when pushing; use the configured token when the user approves.
+- Box/API scripts when token is valid: `mcp-box-minimal/scripts/create-m1-folders.mjs`, `map-box-folder.mjs`, `download-box-folder.mjs`, and other Box scripts under `mcp-box-minimal/scripts/` that do not refresh or obtain tokens.
+- Other scripts in `scripts/` that do not touch credentials or auth (e.g. `scripts/box-token-applied.sh` after the user has run token refresh).
+
+## Always ask before running (use exact phrasing)
+
+- **Box token refresh**: When a Box API call fails with 401 or token expiry is detected, do NOT attempt to refresh automatically. Say: **"A new Box token is needed. Should I run the script?"** Then wait for confirmation before running `node mcp-box-minimal/scripts/get-oauth-token.js`.
+- **Any script that obtains or refreshes credentials**: e.g. `get-oauth-token.js`, or any script under a future `scripts/auth/` directory.
+- **Destructive operations**: delete, truncate, drop, `rm -rf`, or scripts that permanently remove data. Say what will be done and ask: "Should I proceed?"
+- **Database migrations**: If a migration is ready to run, ask: "A migration is ready to run. Should I proceed?"
+- **Merge to main / push to main (project-development repos)**: For repos that are project-development (e.g. otter in `Projects/otter`), do not merge to main, push to main, or reset main unless the user has **specifically authorized** it. This includes running workflows like **ai-local-merge** when the target repo is otter (or another project-development repo). See `.cursor/rules/workspace-context.mdc` (main branch protected).
+
+## Running cursor-ops scripts from another project
+
+When the working directory is outside cursor-ops but you need to run a cursor-ops script (e.g. Box or session script), use the full path to the script and set `CURSOR_OPS` to the cursor-ops repo root so the script can find `config/box.env` and project paths. Example: `CURSOR_OPS=/path/to/cursor-ops node /path/to/cursor-ops/mcp-box-minimal/scripts/create-m1-folders.mjs`.
+
+## Secrets and logging
+
+**Never output, log, or include tokens, API keys, or passwords** in responses, logs, or committed content. If a script or tool returns a secret, do not echo it or store it in a file that could be committed.
+
+## Distinction
+
+"Can run" = script exists and permissions allow it. "Should run" = allowed by this policy. For credential/auth flows, always ask first even if the agent can run the script.

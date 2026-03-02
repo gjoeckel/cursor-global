@@ -5,6 +5,22 @@
 
 ---
 
+## 🛡️ Protocol Workflows
+
+Standardized communication protocols for AI interactions.
+
+| Workflow | Description | Script |
+|----------|-------------|--------|
+| **RRW** | Read-Request-Wait: Repeat understanding, request info, and wait for auth | `rrw-protocol.sh` |
+| **rewire-next** | Rewire next — show current phase and next steps (read Otter workflow state and AGENT-STARTUP) | `rewire-next.sh` |
+| **deploy onlinecourses-test** | Deploy updated code to https://webaim.org/onlinecourses-otter (Option B: push services, then server steps) | `deploy-onlinecourses-otter.sh` |
+| **production-sync-check** | Dry-run only: compare server vs local, otter alignment, preservation recommendation | `production-sync-check.sh` |
+| **production-new-local** | Create new local production copy: rename, mkdir new, sync from server, update state | `production-new-local.sh` |
+| **mapping-audit** | Full mapping process: prod vs test tree diff, optional server vs local, DB call map; report to docs/status; updates "Last updated" and "Last audit" (Source, Git ref) in mapping docs; writes ONLY-IN-TEST-PATHS.md checklist (project resources) | `mapping-audit.sh` |
+| **mapping-audit-skip-ssh** | Same as mapping-audit but skip SSH server comparison | `mapping-audit.sh --skip-ssh` |
+
+---
+
 ## 🤖 AI Session Management Workflows
 
 Manage AI session context, changelogs, and progress tracking.
@@ -97,7 +113,8 @@ restart-mcp-servers.sh
 | **MCP Server Management** | 2 | `mcp-*` | Global - all projects |
 | **Git Operations** | 2 | `ai-*` | Global - all projects |
 | **Utility** | 1 | `ai-*` | Global - all projects |
-| **Total Global** | **10** | - | All Cursor projects |
+| **Protocol** | 1 | `RRW` | Global - all projects |
+| **Total Global** | **11** | - | All Cursor projects |
 
 ---
 
@@ -224,6 +241,7 @@ Add to `<project>/.cursor/workflows.json`:
 
 - **~/.cursor/README.md** - Complete global configuration guide
 - **~/.cursor/global-scripts.json** - Script registry and metadata
+- **docs/RRW-PROTOCOL-WORKFLOW.md** - Read-Request-Wait Protocol Guide
 - **GLOBAL-FUNCTIONS-ANALYSIS.md** - Full analysis of global vs project functions
 - **WORKFLOW-NAMING-ANALYSIS.md** - Conflict analysis and naming best practices
 

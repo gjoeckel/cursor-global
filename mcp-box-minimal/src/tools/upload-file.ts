@@ -1,5 +1,6 @@
-import { getBoxClient } from '../box-client.js';
+import { executeWithRefresh, getBoxClient } from '../box-client.js';
 import { Readable } from 'stream';
+import { withAuthErrorHandling } from '../utils/error-handler.js';
 
 export const uploadFileSchema = {
   name: 'box_upload_file',
@@ -34,9 +35,6 @@ export async function uploadFile(args: {
   content: string;
   content_encoding?: string;
 }) {
-  const client = getBoxClient();
-
-  // Convert content to buffer
   let fileBuffer: Buffer;
   if (args.content_encoding === 'base64') {
     fileBuffer = Buffer.from(args.content, 'base64');
@@ -44,7 +42,8 @@ export async function uploadFile(args: {
     fileBuffer = Buffer.from(args.content, 'utf-8');
   }
 
-  // Upload file using uploads manager
+  return executeWithRefresh(() => withAuthErrorHandling(async () => {
+  const client = getBoxClient();
   const uploadedFile = await client.uploads.uploadFile({
     attributes: {
       name: args.file_name,
@@ -65,4 +64,5 @@ export async function uploadFile(args: {
       name: uploadedFile.entries[0].parent.name,
     } : null,
   };
+  }));
 }

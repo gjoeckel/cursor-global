@@ -37,10 +37,10 @@ export async function listProjects(args: {
     // List projects in a specific workspace
     const workspaceProjects = await new Promise((resolve, reject) => {
       client.projects.getProjects({
-        workspace: args.workspace,
-        archived: args.archived || false,
+      workspace: args.workspace,
+      archived: args.archived || false,
         opt_fields: ['name', 'notes', 'archived', 'color', 'created_at', 'modified_at', 'public', 'workspace'],
-        limit,
+      limit,
       }, (error: any, data: any) => {
         if (error) reject(error);
         else resolve(data);
@@ -64,10 +64,10 @@ export async function listProjects(args: {
       try {
         const workspaceProjects = await new Promise((resolve, reject) => {
           client.projects.getProjects({
-            workspace: workspace.gid,
-            archived: args.archived || false,
+          workspace: workspace.gid,
+          archived: args.archived || false,
             opt_fields: ['name', 'notes', 'archived', 'color', 'created_at', 'modified_at', 'public', 'workspace'],
-            limit: 100, // Get max per workspace
+          limit: 100, // Get max per workspace
           }, (error: any, data: any) => {
             if (error) reject(error);
             else resolve(data);

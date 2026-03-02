@@ -54,17 +54,12 @@ if [ -f "$HOME/.cursor/workflows.json" ] && [ ! -L "$HOME/.cursor/workflows.json
     mv "$HOME/.cursor/workflows.json" "$HOME/.cursor/workflows.json.backup.$(date +%Y%m%d-%H%M%S)"
 fi
 
-if [ -f "$HOME/.cursor/mcp.json" ] && [ ! -L "$HOME/.cursor/mcp.json" ]; then
-    echo -e "${YELLOW}   Backing up existing mcp.json${NC}"
-    mv "$HOME/.cursor/mcp.json" "$HOME/.cursor/mcp.json.backup.$(date +%Y%m%d-%H%M%S)"
-fi
-
-# Create symlinks using detected path
+# Create symlink for workflows.json
 ln -sf "$CONFIG_DIR/workflows.json" "$HOME/.cursor/workflows.json"
-ln -sf "$CONFIG_DIR/mcp.json" "$HOME/.cursor/mcp.json"
-
 echo -e "${GREEN}   ✅ workflows.json symlinked${NC}"
-echo -e "${GREEN}   ✅ mcp.json symlinked${NC}"
+
+# Note: mcp.json is handled by setup-mcp-servers.sh (creates file with resolved paths)
+echo -e "${BLUE}   ℹ️  mcp.json will be configured by MCP server setup${NC}"
 
 # Make all scripts executable
 echo -e "${BLUE}🔧 Making scripts executable...${NC}"
@@ -77,8 +72,11 @@ WORKFLOWS_JSON="$CONFIG_DIR/workflows.json"
 
 if [ -f "$WORKFLOWS_JSON" ]; then
     # Update all script paths in workflows.json to use the detected location
+    # Handle various path patterns (cursor-global, cursor-ops, absolute paths)
     sed -i.bak "s|bash ~/cursor-global/scripts/|bash $SCRIPTS_DIR/|g" "$WORKFLOWS_JSON"
     sed -i.bak "s|bash \$HOME/cursor-global/scripts/|bash $SCRIPTS_DIR/|g" "$WORKFLOWS_JSON"
+    sed -i.bak "s|bash /Users/[^/]*/Agents/cursor-ops/scripts/|bash $SCRIPTS_DIR/|g" "$WORKFLOWS_JSON"
+    sed -i.bak "s|bash /Users/[^/]*/cursor-global/scripts/|bash $SCRIPTS_DIR/|g" "$WORKFLOWS_JSON"
 
     # Clean up backup file
     rm -f "$WORKFLOWS_JSON.bak"
@@ -171,6 +169,32 @@ else
     echo -e "${YELLOW}      Install: brew install jq (macOS) or apt-get install jq (Linux)${NC}"
 fi
 
+# Setup autonomous operation
+echo ""
+echo -e "${BLUE}🤖 Configuring autonomous operation...${NC}"
+if [ -f "$SCRIPTS_DIR/configure-cursor-autonomy.sh" ]; then
+    chmod +x "$SCRIPTS_DIR/configure-cursor-autonomy.sh"
+    "$SCRIPTS_DIR/configure-cursor-autonomy.sh" || {
+        echo -e "${YELLOW}   ⚠️  Autonomy configuration had warnings (non-critical)${NC}"
+    }
+    echo -e "${GREEN}   ✅ Autonomous operation configured${NC}"
+else
+    echo -e "${YELLOW}   ⚠️  configure-cursor-autonomy.sh not found${NC}"
+fi
+
+# Setup MCP servers
+echo ""
+echo -e "${BLUE}📦 Setting up MCP servers...${NC}"
+if [ -f "$SCRIPTS_DIR/setup-mcp-servers.sh" ]; then
+    chmod +x "$SCRIPTS_DIR/setup-mcp-servers.sh"
+    "$SCRIPTS_DIR/setup-mcp-servers.sh" || {
+        echo -e "${YELLOW}   ⚠️  MCP server setup had warnings (check logs)${NC}"
+    }
+    echo -e "${GREEN}   ✅ MCP servers configured${NC}"
+else
+    echo -e "${YELLOW}   ⚠️  setup-mcp-servers.sh not found${NC}"
+fi
+
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${GREEN}✅ Cursor Global Configuration Setup Complete!${NC}"
@@ -180,9 +204,10 @@ echo -e "${GREEN}📍 Installed at:${NC} ${CURSOR_GLOBAL_DIR}"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo -e "  1. ${BLUE}Reload shell:${NC} source $SHELL_CONFIG"
-echo -e "  2. ${BLUE}Restart Cursor IDE${NC} to load new workflows"
-echo -e "  3. ${BLUE}Test workflows:${NC} Type 'ai-start' in Cursor chat"
-echo -e "  4. ${BLUE}Verify scripts:${NC} Run 'session-start.sh' from any directory"
+echo -e "  2. ${BLUE}Restart Cursor IDE${NC} to load new workflows and MCP servers"
+echo -e "  3. ${BLUE}Verify MCP servers:${NC} Type 'mcp-health' in Cursor chat"
+echo -e "  4. ${BLUE}Test workflows:${NC} Type 'ai-start' in Cursor chat"
+echo -e "  5. ${BLUE}Verify scripts:${NC} Run 'session-start.sh' from any directory"
 echo ""
 echo -e "${GREEN}Available Global Workflows:${NC}"
 echo -e "  • ${BLUE}ai-start${NC} - Load session context"

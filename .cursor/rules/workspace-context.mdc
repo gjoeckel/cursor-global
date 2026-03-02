@@ -1,0 +1,44 @@
+---
+description: Cursor-ops read-only default and project paths convention (resources vs development)
+alwaysApply: true
+---
+
+# Workspace Context and Project Paths
+
+## Cursor-ops working directory is READ-ONLY by default
+
+The **cursor-ops** working directory must be treated as **read-only** unless one of the following applies:
+
+1. **Authorized task** — The user's request or the active task explicitly involves cursor-ops (e.g. "update cursor-ops docs," "add a rule," "edit config/workflows.json," "run a cursor-ops script").
+2. **Explicit authorization** — The user has granted permission (e.g. said "GO" or "you may edit cursor-ops") to create or change files or config in cursor-ops.
+
+**Authorized** means: the user or task clearly indicates cursor-ops is in scope for writes. When in doubt, do not create or edit files in cursor-ops; ask for confirmation.
+
+**Read-only** applies to **creating, editing, or deleting files and config** in cursor-ops. It does **not** forbid running scripts that live in cursor-ops (e.g. `scripts/map-otter-db-usage.sh`, `scripts/display-project-paths.sh`) when the task is about another project (e.g. otter). Those scripts may be executed from cursor-ops when the work is authorized for that project; only writes to the cursor-ops tree require authorization as above.
+
+---
+
+## "Resources" and "Development" mean project paths
+
+When the user says **"resources"** or **"development"** (or "project resources" / "project development") without naming a project:
+
+- Assume the **current project** from context (e.g. otter). The current project is established by the **/change-project** workflow and reflected in `config/project-paths.json`.
+- **Resources** = the **project resources** path: `~/Agents/resources/<project>` (e.g. `/Users/a00288946/Agents/resources/otter`). Exact paths are in `config/project-paths.json` under the project's `resources.folder`.
+- **Development** = the **project development** path: `~/Projects/<project>` (e.g. `/Users/a00288946/Projects/otter`). Exact paths are in `config/project-paths.json` under the project's `development.folder`.
+
+Until the framework changes:
+
+- **Cursor-ops** is always the working directory (or part of it).
+- **Project resources** are always in a project-specific folder under `/Users/a00288946/Agents/resources`.
+- **Project development** code is always in a project-specific folder under `/Users/a00288946/Projects`.
+
+Both paths are set by running the **/change-project** workflow.
+
+---
+
+## Project development: main branch is protected
+
+For project development repos (e.g. otter in `Projects/otter`):
+
+- **Default working branch** is **services** (or the branch established by the project workflow). Keep the local repo on **services** unless the user explicitly asks to work on another branch.
+- **No changes to main** — Do not make changes to the **local main** branch or the **remote main** branch (checkout main, merge to main, push to main, reset main, etc.) unless the user has **specifically authorized** that action. If a task would require modifying or pushing main, ask for explicit authorization first. **Workflows or commands that merge to main or push main** (e.g. **ai-local-merge** in cursor-ops) count as changes to main and require explicit authorization when the target repo is a project-development repo (e.g. otter).

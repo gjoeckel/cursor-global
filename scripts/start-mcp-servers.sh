@@ -1,7 +1,7 @@
 #!/bin/bash
 # Start Optimized MCP Servers for Autonomous Operation
 # This script starts only essential servers to stay under 40-tool limit
-# Tool count: Filesystem(15) + Memory(8) + Shell Minimal(4) + GitHub Minimal(4) + Puppeteer Minimal(4) + Agent Autonomy(4) = 39 tools
+# Tool count: Filesystem(15) + Memory(8) + Shell Minimal(4) + GitHub Minimal(4) + Playwright Minimal(4) + Agent Autonomy(4) = 39 tools
 # Uses remote repository: https://github.com/gjoeckel/my-mcp-servers
 
 set -euo pipefail
@@ -80,7 +80,7 @@ trap 'rm -f "$LOCK_FILE"' EXIT
 : > "$LOCK_FILE"
 
 # Determine which servers need starting (skip running)
-servers=("filesystem" "memory" "shell-minimal" "github-minimal" "puppeteer-minimal" "agent-autonomy")
+servers=("filesystem" "memory" "shell-minimal" "github-minimal" "playwright-minimal" "agent-autonomy")
 needs_start=()
 for s in "${servers[@]}"; do
   pid_file="$PROJECT_ROOT/.cursor/${s}.pid"
@@ -152,13 +152,13 @@ else
   echo "⏭️  github-minimal already running"
 fi
 
-# Puppeteer Minimal MCP (4 tools - essential browser automation)
-if [ ${#needs_start[@]} -gt 0 ] && array_contains "puppeteer-minimal" "${needs_start[@]}"; then
-  start_mcp_server "puppeteer-minimal" \
+# Playwright Minimal MCP (4 tools - essential browser automation)
+if [ ${#needs_start[@]} -gt 0 ] && array_contains "playwright-minimal" "${needs_start[@]}"; then
+  start_mcp_server "playwright-minimal" \
     "npx" \
-    "-y git+https://github.com/gjoeckel/my-mcp-servers.git#mcp-restart:packages/puppeteer-minimal"
+    "-y git+https://github.com/gjoeckel/my-mcp-servers.git#mcp-restart:packages/playwright-minimal"
 else
-  echo "⏭️  puppeteer-minimal already running"
+  echo "⏭️  playwright-minimal already running"
 fi
 
 # Agent Autonomy MCP (4 tools - workflow automation)
@@ -174,7 +174,7 @@ echo "   ✅ Filesystem: 15 tools (official - file operations)"
 echo "   ✅ Memory: 8 tools (official - knowledge storage)"
 echo "   ✅ Shell Minimal: 4 tools (custom - shell commands)"
 echo "   ✅ GitHub Minimal: 4 tools (custom - GitHub operations)"
-echo "   ✅ Puppeteer Minimal: 4 tools (custom - browser automation)"
+echo "   ✅ Playwright Minimal: 4 tools (custom - browser automation)"
 echo "   ✅ Agent Autonomy: 4 tools (custom - workflow automation)"
 echo "   📈 Total: 39 tools (just under 40-tool limit)"
 
@@ -208,7 +208,7 @@ cat > "$PROJECT_ROOT/.cursor/mcp-status.json" << EOF
     "memory": $(if [ -f "$PROJECT_ROOT/.cursor/memory.pid" ]; then echo "true"; else echo "false"; fi),
     "shell-minimal": $(if [ -f "$PROJECT_ROOT/.cursor/shell-minimal.pid" ]; then echo "true"; else echo "false"; fi),
     "github-minimal": $(if [ -f "$PROJECT_ROOT/.cursor/github-minimal.pid" ]; then echo "true"; else echo "false"; fi),
-    "puppeteer-minimal": $(if [ -f "$PROJECT_ROOT/.cursor/puppeteer-minimal.pid" ]; then echo "true"; else echo "false"; fi),
+    "playwright-minimal": $(if [ -f "$PROJECT_ROOT/.cursor/playwright-minimal.pid" ]; then echo "true"; else echo "false"; fi),
     "agent-autonomy": $(if [ -f "$PROJECT_ROOT/.cursor/agent-autonomy.pid" ]; then echo "true"; else echo "false"; fi)
   },
   "autonomous_mode": true,
@@ -225,7 +225,7 @@ echo "✅ Filesystem MCP server (15 tools)"
 echo "✅ Memory MCP server (8 tools)"
 echo "✅ Shell Minimal MCP server (4 tools)"
 echo "✅ GitHub Minimal MCP server (4 tools)"
-echo "✅ Puppeteer Minimal MCP server (4 tools)"
+echo "✅ Playwright Minimal MCP server (4 tools)"
 echo "✅ Agent Autonomy MCP server (4 tools)"
 echo "✅ Total: 39 tools (just under 40-tool limit)"
 echo "✅ Autonomous operation enabled"
@@ -242,7 +242,7 @@ echo "   • Filesystem: File operations, directory navigation, content manageme
 echo "   • Memory: Knowledge storage, entity management, search (8 tools)"
 echo "   • Shell Minimal: Essential shell commands (4 tools)"
 echo "   • GitHub Minimal: Repository operations (4 tools)"
-echo "   • Puppeteer Minimal: Browser automation (4 tools)"
+echo "   • Playwright Minimal: Browser automation (4 tools)"
 echo "   • Agent Autonomy: Workflow automation (4 tools)"
 echo ""
 echo "🔧 Essential Tools Available:"
@@ -250,7 +250,7 @@ echo "   Filesystem: read, write, list, search, create, move, delete files/direc
 echo "   Memory: create_entities, create_relations, search_nodes, read_graph"
 echo "   Shell: execute_command, list_processes, kill_process, get_environment"
 echo "   GitHub: get_file_contents, create_or_update_file, push_files, search_repositories"
-echo "   Puppeteer: navigate, take_screenshot, extract_text, click_element"
+echo "   Playwright: navigate, take_screenshot, extract_text, click_element"
 echo "   Agent Autonomy: execute_workflow, list_workflows, register_workflow, check_approval"
 echo ""
 echo "📈 Tool Count Optimization:"

@@ -10,6 +10,7 @@
 - Initial AI changelog automation system setup
 - SRD development environment configured
 - MCP tools installed and operational
+- 2026-02-13: Canvas reports (reports_generator) session changelog added; docs/resources reorganized (architecture + legacy)
 
 ## 💡 **Key Decisions & Context**
 - Focus on Simple, Reliable, DRY development principles
@@ -22,6 +23,7 @@
 - Integrate with MCP memory for persistent storage
 
 ## 📊 **Active Configurations**
+- **Project Paths**: Configured via `config/project-paths.json`
 - **MCP Servers**: memory, github, filesystem, sequential-thinking, everything, puppeteer, postgres
 - **SRD Tools**: ESLint, Prettier, Jest with SRD-specific rules
 - **GitHub Push Gate**: Requires token "push to github"

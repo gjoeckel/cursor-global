@@ -12,11 +12,16 @@ import { getTask, getTaskSchema } from './tools/get-task.js';
 import { listTasks, listTasksSchema } from './tools/list-tasks.js';
 import { listProjects, listProjectsSchema } from './tools/list-projects.js';
 import { addComment, addCommentSchema } from './tools/add-comment.js';
+import { createSection, createSectionSchema } from './tools/create-section.js';
+import { listSections, listSectionsSchema } from './tools/list-sections.js';
+import { addTaskToSection, addTaskToSectionSchema } from './tools/add-task-to-section.js';
+import { createSubtask, createSubtaskSchema } from './tools/create-subtask.js';
+import { listSubtasks, listSubtasksSchema } from './tools/list-subtasks.js';
 
 const server = new Server(
   {
     name: 'asana-minimal',
-    version: '1.0.0',
+    version: '1.3.0',
   },
   {
     capabilities: {
@@ -34,6 +39,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     listTasksSchema,
     listProjectsSchema,
     addCommentSchema,
+    createSectionSchema,
+    listSectionsSchema,
+    addTaskToSectionSchema,
+    createSubtaskSchema,
+    listSubtasksSchema,
   ],
 }));
 
@@ -105,6 +115,61 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: 'text',
               text: JSON.stringify(addCommentResult, null, 2),
+            },
+          ],
+        };
+
+      case 'asana_create_section':
+        const createSectionResult = await createSection(args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(createSectionResult, null, 2),
+            },
+          ],
+        };
+
+      case 'asana_list_sections':
+        const listSectionsResult = await listSections(args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(listSectionsResult, null, 2),
+            },
+          ],
+        };
+
+      case 'asana_add_task_to_section':
+        const addTaskToSectionResult = await addTaskToSection(args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(addTaskToSectionResult, null, 2),
+            },
+          ],
+        };
+
+      case 'asana_create_subtask':
+        const createSubtaskResult = await createSubtask(args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(createSubtaskResult, null, 2),
+            },
+          ],
+        };
+
+      case 'asana_list_subtasks':
+        const listSubtasksResult = await listSubtasks(args as any);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(listSubtasksResult, null, 2),
             },
           ],
         };

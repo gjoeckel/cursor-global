@@ -1,0 +1,20 @@
+==============================================
+  /yolo-full measurement report
+  20260224-153432
+==============================================
+
+COMPLETENESS: true
+  - All steps exit 0: true
+  - Step 1 valid JSON: true
+  - Step 2 project paths output: true
+  - Step 3 startup ref: true
+  - Step 4/5 quickstart ref: true
+
+EFFICIENCY: true (total 0s, threshold 20s)
+  Step 1: 0s
+  Step 2: 0s
+  Step 3: 0s
+  Step 4: 0s
+  Step 5: 0s
+
+==============================================

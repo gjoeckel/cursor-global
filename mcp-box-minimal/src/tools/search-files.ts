@@ -1,4 +1,5 @@
-import { getBoxClient } from '../box-client.js';
+import { executeWithRefresh, getBoxClient } from '../box-client.js';
+import { withAuthErrorHandling } from '../utils/error-handler.js';
 
 export const searchFilesSchema = {
   name: 'box_search_files',
@@ -36,8 +37,6 @@ export async function searchFiles(args: {
   limit?: number;
   offset?: number;
 }) {
-  const client = getBoxClient();
-
   const limit = Math.min(args.limit || 30, 200);
   const offset = args.offset || 0;
 
@@ -54,6 +53,8 @@ export async function searchFiles(args: {
     searchParams.queryParams.file_extensions = args.file_extensions;
   }
 
+  return executeWithRefresh(() => withAuthErrorHandling(async () => {
+  const client = getBoxClient();
   const results = await client.search.searchForContent(searchParams);
 
   return {
@@ -73,4 +74,5 @@ export async function searchFiles(args: {
     limit,
     offset,
   };
+  }));
 }

@@ -42,9 +42,20 @@ A lightweight Model Context Protocol (MCP) server for Box that provides only the
 2. Click "Generate Developer Token"
 3. Copy the token (expires in 60 minutes)
 
-**Option 2: OAuth Access Token (Production)**
-1. Complete OAuth flow to get access token
-2. Store token securely
+**Option 2: OAuth Access Token (Production, recommended)**
+
+Run the OAuth script from cursor-ops (with `BOX_CLIENT_ID` and `BOX_CLIENT_SECRET` set):
+
+```bash
+cd <cursor-ops>/mcp-box-minimal
+node scripts/get-oauth-token.js
+```
+
+The script opens a browser for auth, then writes the token to **both**:
+- **~/.zshrc** (for terminal use)
+- **cursor-ops `config/box.env`** (for the Box MCP when Cursor is started from the Dock)
+
+Then **restart Cursor** once so the Box MCP loads the tokens. The MCP **auto-refreshes** the access token when it expires (using the refresh token), so you do not need to re-run the script every hour. Re-run the OAuth script only if the refresh token expires (e.g. after 60 days) or you revoke access.
 
 ### Set Environment Variables
 
@@ -66,18 +77,27 @@ source ~/.zshrc
 
 ## Configuration
 
-Add to your `~/.cursor/mcp.json`:
+When using **cursor-ops** (recommended), the Box MCP is started via a wrapper that sources the token so it works when you **launch Cursor from the Dock** (not from a terminal). The wrapper:
+
+1. Sources `config/box.env` from cursor-ops (default: `$HOME/Agents/cursor-ops`; override with `CURSOR_OPS`)
+2. Sources `~/.zshrc`
+3. Runs `npx -y mcp-box-minimal`
+
+So you only need to run `node scripts/get-oauth-token.js` and restart Cursor; no need to start Cursor from a terminal. See **config/README.md** in cursor-ops for the full “Box MCP token (cursor-ops)” section.
+
+**Example MCP entry** (cursor-ops `config/mcp.json` style; command/args use the wrapper):
 
 ```json
 {
   "mcpServers": {
     "box-minimal": {
-      "command": "node",
-      "args": ["/path/to/mcp-box-minimal/dist/index.js"],
+      "command": "zsh",
+      "args": ["-c", "source \"${CURSOR_OPS:-$HOME/Agents/cursor-ops}/config/box.env\" 2>/dev/null; source ~/.zshrc 2>/dev/null; exec npx -y mcp-box-minimal"],
       "env": {
         "BOX_CLIENT_ID": "${BOX_CLIENT_ID}",
         "BOX_CLIENT_SECRET": "${BOX_CLIENT_SECRET}",
-        "BOX_ACCESS_TOKEN": "${BOX_ACCESS_TOKEN}"
+        "BOX_ACCESS_TOKEN": "${BOX_ACCESS_TOKEN}",
+        "BOX_DEV_TOKEN": "${BOX_DEV_TOKEN}"
       }
     }
   }

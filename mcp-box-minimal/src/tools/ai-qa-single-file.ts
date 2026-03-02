@@ -1,4 +1,5 @@
-import { getBoxClient } from '../box-client.js';
+import { executeWithRefresh, getBoxClient } from '../box-client.js';
+import { isBoxAuthError, withAuthErrorHandling } from '../utils/error-handler.js';
 
 export const aiQaSingleFileSchema = {
   name: 'box_ai_qa_single_file',
@@ -23,11 +24,9 @@ export async function aiQaSingleFile(args: {
   file_id: string;
   question: string;
 }) {
-  const client = getBoxClient();
-
-  try {
-    // Box AI API endpoint for single file queries
-    // Note: This uses Box's AI API which may require specific permissions
+  return executeWithRefresh(() => withAuthErrorHandling(async () => {
+    try {
+    const client = getBoxClient();
     const response = await client.ai.createAiAsk({
       items: [
         {
@@ -45,7 +44,7 @@ export async function aiQaSingleFile(args: {
       citations: response.citations || [],
     };
   } catch (error: any) {
-    // If Box AI API is not available, provide helpful error
+    if (isBoxAuthError(error)) throw error;
     if (error.statusCode === 403 || error.statusCode === 404) {
       throw new Error(
         'Box AI is not available for this file or account. ' +
@@ -54,4 +53,5 @@ export async function aiQaSingleFile(args: {
     }
     throw new Error(`Box AI query failed: ${error.message || String(error)}`);
   }
+  }));
 }

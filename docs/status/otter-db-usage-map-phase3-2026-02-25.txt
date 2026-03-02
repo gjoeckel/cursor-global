@@ -1,0 +1,50 @@
+Otter DB usage map — 2026-02-25 15:02
+OTTER_ROOT=/Users/a00288946/Projects/otter
+
+--- clients/admin/registrations.php
+    getDbConnection: 1
+
+--- clients/admin/certificates.php
+    getDbConnection: 1
+
+--- services/database/repositories/new_database_service.php
+    fetchArray: 7
+    fetchAll: 6
+    getDbConnection: 16
+    new db(): 1
+    includes/db.php refs: 1
+
+--- services/database/session_handler.php
+    query: 3
+    affectedRows: 1
+    new db(): 1
+    includes/db.php refs: 9
+
+--- services/canvas/data/canvas_course_service.php
+    getDbConnection: 2
+
+--- services/canvas/data/canvas_mapping_service.php
+    getDbConnection: 3
+
+--- services/api/endpoints/database-api.php
+    getDbConnection: 4
+
+--- services/api/endpoints/reports-api.php
+    fetchAll: 1
+    getDbConnection: 4
+
+--- services/api/canvas_data_sync.php
+    query: 2
+
+=== Totals (approximate)
+  query: 5
+  fetchArray: 7
+  fetchAll: 7
+  affectedRows: 1
+  lastInsertID: 0
+  getDbConnection: 31
+  new db(): 2
+  DbMysqliWrapper refs: 0
+  includes/db.php refs: 10
+
+Use this map to guide Phase 2 (migrate call sites) and Phase 3 (verify no legacy usage).

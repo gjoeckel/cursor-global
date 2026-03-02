@@ -1,4 +1,5 @@
-import { getBoxClient } from '../box-client.js';
+import { executeWithRefresh, getBoxClient } from '../box-client.js';
+import { isBoxAuthError, withAuthErrorHandling } from '../utils/error-handler.js';
 
 export const getFileContentSchema = {
   name: 'box_get_file_content',
@@ -23,11 +24,12 @@ export async function getFileContent(args: {
   file_id: string;
   as_text?: boolean;
 }) {
-  const client = getBoxClient();
+  return executeWithRefresh(() => withAuthErrorHandling(async () => {
+  try {
   const asText = args.as_text !== false; // Default to true
 
-  // Get file representation (for text extraction)
-  try {
+  const client = getBoxClient();
+
     // First, get file info to check type
     const fileInfo = await client.files.getFileById(args.file_id);
 
@@ -35,6 +37,7 @@ export async function getFileContent(args: {
     if (fileInfo.name.endsWith('.txt') || fileInfo.name.endsWith('.md') ||
         fileInfo.name.endsWith('.json') || fileInfo.name.endsWith('.csv')) {
       const stream = await client.downloads.downloadFile(args.file_id);
+
       if (stream) {
         const chunks: Buffer[] = [];
 
@@ -67,6 +70,9 @@ export async function getFileContent(args: {
       message: 'For PDF/Word files, use box_ai_qa_single_file to extract text content',
     };
   } catch (error: any) {
+    if (isBoxAuthError(error)) throw error;
     throw new Error(`Failed to get file content: ${error.message || String(error)}`);
   }
+  }
+  ));
 }

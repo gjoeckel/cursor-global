@@ -7,6 +7,9 @@
  * 2. Opening it in your browser
  * 3. Capturing the authorization code from the redirect
  * 4. Exchanging it for an access token
+ * 5. Adding it to ~/.zshrc and to cursor-ops config/box.env (for MCP when Cursor is launched from Dock)
+ * 6. Loading the new token
+ * 7. Prompting to restart Cursor
  */
 
 import { BoxOAuth, OAuthConfig } from 'box-node-sdk';
@@ -14,13 +17,21 @@ import { createServer } from 'http';
 import { parse } from 'url';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { homedir } from 'os';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const execAsync = promisify(exec);
 
 const CLIENT_ID = process.env.BOX_CLIENT_ID;
 const CLIENT_SECRET = process.env.BOX_CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:5000/callback';
 const PORT = 5000;
+const ZSHRC_PATH = join(homedir(), '.zshrc');
+// cursor-ops config/box.env (script lives in mcp-box-minimal/scripts/ → ../../config/box.env)
+const CURSOR_OPS_BOX_ENV = join(__dirname, '..', '..', 'config', 'box.env');
 
 if (!CLIENT_ID || !CLIENT_SECRET) {
   console.error('❌ Error: BOX_CLIENT_ID and BOX_CLIENT_SECRET must be set');
@@ -41,14 +52,16 @@ const config = new OAuthConfig({
 const oauth = new BoxOAuth({ config });
 
 // Step 1: Generate authorization URL
+// ai.readwrite is required for Box AI (e.g. earned-date script); enable "Manage AI" in Developer Console.
 const authUrl = oauth.getAuthorizeUrl({
   redirectUri: REDIRECT_URI,
   responseType: 'code',
-  scope: 'root_readwrite',
+  scope: 'root_readwrite ai.readwrite',
 });
 
 console.log('📋 Step 1: Authorize the application');
 console.log('Opening browser...\n');
+console.log('👉 IMPORTANT: Click "Authorize" in the browser window that opens\n');
 console.log('If browser doesn\'t open, visit this URL:');
 console.log(authUrl);
 console.log('');
@@ -67,6 +80,77 @@ if (platform === 'darwin') {
 execAsync(`${openCmd} "${authUrl}"`).catch(() => {
   // Ignore errors - user can open manually
 });
+
+// Function to update .zshrc with new token(s)
+function updateZshrc(newToken, newRefreshToken) {
+  try {
+    // Read current .zshrc
+    let zshrcContent = '';
+    try {
+      zshrcContent = readFileSync(ZSHRC_PATH, 'utf-8');
+    } catch (err) {
+      // File doesn't exist, that's okay
+      console.log('📝 Creating new ~/.zshrc file...');
+    }
+
+    // Update BOX_ACCESS_TOKEN and optionally BOX_REFRESH_TOKEN
+    const tokenRegex = /^export BOX_ACCESS_TOKEN=.*$/m;
+    const refreshTokenRegex = /^export BOX_REFRESH_TOKEN=.*$/m;
+
+    if (tokenRegex.test(zshrcContent)) {
+      zshrcContent = zshrcContent.replace(tokenRegex, `export BOX_ACCESS_TOKEN="${newToken}"`);
+      console.log('✅ Updated existing BOX_ACCESS_TOKEN in ~/.zshrc');
+    } else {
+      if (zshrcContent && !zshrcContent.endsWith('\n')) {
+        zshrcContent += '\n';
+      }
+      zshrcContent += `\n# Box OAuth (updated by get-oauth-token.js)\nexport BOX_ACCESS_TOKEN="${newToken}"\n`;
+      console.log('✅ Added BOX_ACCESS_TOKEN to ~/.zshrc');
+    }
+
+    if (newRefreshToken) {
+      if (refreshTokenRegex.test(zshrcContent)) {
+        zshrcContent = zshrcContent.replace(refreshTokenRegex, `export BOX_REFRESH_TOKEN="${newRefreshToken}"`);
+        console.log('✅ Updated BOX_REFRESH_TOKEN in ~/.zshrc');
+      } else {
+        zshrcContent += `export BOX_REFRESH_TOKEN="${newRefreshToken}"\n`;
+        console.log('✅ Added BOX_REFRESH_TOKEN to ~/.zshrc');
+      }
+    } else if (refreshTokenRegex.test(zshrcContent)) {
+      zshrcContent = zshrcContent.replace(refreshTokenRegex, '');
+    }
+
+    // Write updated content
+    writeFileSync(ZSHRC_PATH, zshrcContent, 'utf-8');
+    return true;
+  } catch (error) {
+    console.error('❌ Error updating ~/.zshrc:', error.message);
+    return false;
+  }
+}
+
+// Write tokens to cursor-ops config/box.env so Box MCP gets them when Cursor is launched from Dock (no .zshrc sourced)
+// Saves both access and refresh token so the MCP can refresh automatically when the access token expires.
+function updateBoxEnv(accessToken, refreshToken) {
+  try {
+    const dir = join(CURSOR_OPS_BOX_ENV, '..');
+    try {
+      mkdirSync(dir, { recursive: true });
+    } catch (e) {
+      /* dir exists */
+    }
+    let content = `# Box OAuth tokens (updated by get-oauth-token.js)\nexport BOX_ACCESS_TOKEN="${accessToken}"\n`;
+    if (refreshToken) {
+      content += `export BOX_REFRESH_TOKEN="${refreshToken}"\n`;
+    }
+    writeFileSync(CURSOR_OPS_BOX_ENV, content, 'utf-8');
+    console.log('✅ Wrote BOX_ACCESS_TOKEN' + (refreshToken ? ' and BOX_REFRESH_TOKEN' : '') + ' to cursor-ops config/box.env');
+    return true;
+  } catch (error) {
+    console.error('❌ Error writing config/box.env:', error.message);
+    return false;
+  }
+}
 
 // Step 2: Create temporary server to capture callback
 const server = createServer(async (req, res) => {
@@ -115,26 +199,42 @@ const server = createServer(async (req, res) => {
       const tokenInfo = await oauth.getTokensAuthorizationCodeGrant(code);
 
       const accessToken = tokenInfo.accessToken;
-      const refreshToken = tokenInfo.refreshToken;
+      const refreshToken = tokenInfo.refreshToken || null;
 
-      console.log('✅ Success! Access token obtained\n');
+      console.log('✅ Success! Access token obtained' + (refreshToken ? ' (with refresh token for auto-renewal)' : '') + '\n');
       console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-      console.log('📝 Add this to your ~/.zshrc:\n');
-      console.log(`export BOX_ACCESS_TOKEN="${accessToken}"`);
-      if (refreshToken) {
-        console.log(`export BOX_REFRESH_TOKEN="${refreshToken}"`);
+      console.log('📝 Step 4: Adding tokens to ~/.zshrc and cursor-ops config/box.env...\n');
+
+      updateZshrc(accessToken, refreshToken);
+      updateBoxEnv(accessToken, refreshToken);
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🔄 Step 5: Loading new token...\n');
+
+      // Run source ~/.zshrc to load the new token in current shell
+      try {
+        await execAsync('source ~/.zshrc', { shell: '/bin/zsh' });
+        console.log('✅ Token loaded into current shell session\n');
+      } catch (err) {
+        console.log('⚠️  Note: Could not automatically load token in current shell');
+        console.log('   Run manually: source ~/.zshrc\n');
       }
-      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
-      console.log('Then run: source ~/.zshrc');
-      console.log('And restart Cursor to use the new token.\n');
+
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('🎉 Token setup complete!\n');
+      if (refreshToken) {
+        console.log('   The MCP will auto-refresh the access token when it expires (no need to re-run this script every hour).');
+        console.log('   Restart Cursor once (Cmd+Q then reopen) so the MCP loads the new tokens.\n');
+      } else {
+        console.log('⚠️  Restart Cursor (Cmd+Q then reopen) so the Box MCP loads the new token.\n');
+      }
 
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end(`
         <html>
           <body style="font-family: Arial; padding: 40px; text-align: center;">
             <h1 style="color: green;">✅ Authorization Successful!</h1>
-            <p>Access token has been obtained.</p>
-            <p>Check your terminal for instructions.</p>
+            <p>Access token has been obtained and added to ~/.zshrc and cursor-ops config/box.env</p>
+            <p>Check your terminal for next steps.</p>
             <p style="margin-top: 30px; color: #666;">You can close this window.</p>
           </body>
         </html>

@@ -1,36 +1,28 @@
 {
   "ai-start": {
     "description": "Load AI session context and initialize environment",
-    "commands": [
-      "bash ~/cursor-global/scripts/session-start.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh session-start"],
     "auto_approve": true,
     "timeout": 30000,
     "on_error": "continue"
   },
   "ai-end": {
     "description": "Save session context and generate changelog",
-    "commands": [
-      "bash ~/cursor-global/scripts/session-end.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh session-end"],
     "auto_approve": true,
     "timeout": 20000,
     "on_error": "continue"
   },
   "ai-update": {
     "description": "Record mid-session progress",
-    "commands": [
-      "bash ~/cursor-global/scripts/session-update.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh session-update"],
     "auto_approve": true,
     "timeout": 20000,
     "on_error": "continue"
   },
   "ai-repeat": {
     "description": "Reload session context",
-    "commands": [
-      "bash ~/cursor-global/scripts/session-start.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh session-start"],
     "auto_approve": true,
     "timeout": 20000,
     "on_error": "continue"
@@ -49,65 +41,141 @@
   },
   "ai-compress": {
     "description": "Compress session context into summary",
-    "commands": [
-      "bash ~/cursor-global/scripts/compress-context.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh compress-context"],
     "auto_approve": true,
     "timeout": 30000,
     "on_error": "continue"
   },
   "mcp-health": {
     "description": "Check MCP server health and status",
-    "commands": [
-      "bash ~/cursor-global/scripts/check-mcp-health.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh check-mcp-health"],
     "auto_approve": true,
     "timeout": 15000,
     "on_error": "continue"
   },
   "mcp-restart": {
     "description": "Restart all MCP servers",
-    "commands": [
-      "bash ~/cursor-global/scripts/restart-mcp-servers.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh restart-mcp-servers"],
     "auto_approve": true,
     "timeout": 30000,
     "on_error": "continue"
   },
   "ai-local-commit": {
     "description": "Update changelog and commit all changes to current local branch",
-    "commands": [
-      "bash ~/cursor-global/scripts/git-local-commit.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh git-local-commit"],
     "auto_approve": true,
     "timeout": 20000,
     "on_error": "continue"
   },
   "ai-local-merge": {
     "description": "Merge current branch to main, auto-updates changelog (handles conflicts gracefully)",
-    "commands": [
-      "bash ~/cursor-global/scripts/git-local-merge.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh git-local-merge"],
     "auto_approve": true,
     "timeout": 30000,
     "on_error": "continue"
   },
   "ai-merge-finalize": {
     "description": "Finalize merge after manual conflict resolution (updates changelog, run from main)",
-    "commands": [
-      "bash ~/cursor-global/scripts/git-local-merge.sh --finalize"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh git-local-merge --finalize"],
     "auto_approve": true,
     "timeout": 10000,
     "on_error": "continue"
   },
   "ai-docs-sync": {
     "description": "Generate project workflows.md from global and project configs",
-    "commands": [
-      "bash ~/cursor-global/scripts/generate-workflows-doc.sh"
-    ],
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh generate-workflows-doc"],
     "auto_approve": true,
     "timeout": 10000,
+    "on_error": "continue"
+  },
+  "mcp-setup": {
+    "description": "Setup and configure MCP servers (re-run if needed)",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh setup-mcp-servers"],
+    "auto_approve": true,
+    "timeout": 60000,
+    "on_error": "continue"
+  },
+  "agent-comms-check": {
+    "description": "Check for pending agent communication messages",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh check-agent-comms"],
+    "auto_approve": true,
+    "timeout": 10000,
+    "on_error": "continue"
+  },
+  "yolo-full": {
+    "description": "Initialize full autonomous mode with MCP validation (per agent-action-policy: run without asking)",
+    "commands": [
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh validate-autonomous-mode --json",
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh display-project-paths",
+      "bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh show-project-startup",
+      "echo 'Next: read docs/AGENT-QUICKSTART.md for current-project context.'",
+      "echo '✅ yolo-full complete. Verify MCP tools connected if needed.'"
+    ],
+    "auto_approve": true,
+    "timeout": 30000,
+    "on_error": "continue"
+  },
+  "start-project": {
+    "description": "Open multi-root workspace with development and resources folders",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh start-project"],
+    "auto_approve": true,
+    "timeout": 30000,
+    "on_error": "continue"
+  },
+  "change-project": {
+    "description": "Update project development and resources folder paths",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh change-project-paths"],
+    "auto_approve": false,
+    "timeout": 60000,
+    "on_error": "stop"
+  },
+  "RRW": {
+    "description": "Read-Request-Wait Protocol: 1) Repeat understanding 2) Request info 3) Wait for auth",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh rrw-protocol"],
+    "auto_approve": false,
+    "timeout": 10000,
+    "on_error": "stop"
+  },
+  "rewire-next": {
+    "description": "Rewire next — show current phase and next steps (read Otter workflow state and AGENT-STARTUP)",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh rewire-next"],
+    "auto_approve": true,
+    "timeout": 10000,
+    "on_error": "continue"
+  },
+  "deploy onlinecourses-test": {
+    "description": "Deploy updated code to https://webaim.org/onlinecourses-otter (Option B: push services, then run server steps from procedure)",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh deploy-onlinecourses-otter"],
+    "auto_approve": true,
+    "timeout": 60000,
+    "on_error": "stop"
+  },
+  "production-sync-check": {
+    "description": "Dry-run only: compare server onlinecourses with local, otter alignment, preservation recommendation",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh production-sync-check"],
+    "auto_approve": true,
+    "timeout": 60000,
+    "on_error": "continue"
+  },
+  "production-new-local": {
+    "description": "Create new local production copy: rename current to preserve path, mkdir new, sync from server, update state",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh production-new-local"],
+    "auto_approve": false,
+    "timeout": 120000,
+    "on_error": "stop"
+  },
+  "mapping-audit": {
+    "description": "Run full mapping process: prod vs test tree diff, optional server vs local, DB call map; report to docs/status",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh mapping-audit"],
+    "auto_approve": true,
+    "timeout": 60000,
+    "on_error": "continue"
+  },
+  "mapping-audit-skip-ssh": {
+    "description": "Mapping audit without SSH server comparison",
+    "commands": ["bash /Users/a00288946/Agents/cursor-ops/scripts/run-workflow.sh mapping-audit --skip-ssh"],
+    "auto_approve": true,
+    "timeout": 45000,
     "on_error": "continue"
   }
 }
